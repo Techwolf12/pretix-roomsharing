@@ -49,7 +49,7 @@ class RoomsharingSettingsForm(SettingsForm):
 
     roomsharing__questions = forms.ChoiceField(
         choices=[],
-        label=_("What is the registration ID question?"),
+        label=_("What is the Roomsharing name question?"),
         required=False,
         widget=RadioSelect,
     )
