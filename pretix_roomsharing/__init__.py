@@ -15,7 +15,9 @@ class PluginApp(PluginConfig):
     class PretixPluginMeta:
         name = gettext_lazy("Roomsharing")
         author = "Christiaan de Die le Clercq (techwolf12)"
-        description = gettext_lazy("Pretix roomsharing allows attendees to setup with which people they'd like to share a room")
+        description = gettext_lazy(
+            "Pretix roomsharing allows attendees to setup with which people they'd like to share a room"
+        )
         visible = True
         version = __version__
         category = "FEATURE"
