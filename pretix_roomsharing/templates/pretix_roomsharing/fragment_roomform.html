@@ -1,0 +1,61 @@
+{% load i18n %}
+{% load bootstrap3 %}
+<div class="panel-group" id="room_accordion">
+    <div class="panel panel-default">
+        <label class="accordion-radio">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <input type="radio" name="room_mode" value="none"
+                            data-parent="#room_accordion"
+                            {% if selected == "none" %}checked="checked"{% endif %}
+                            data-toggle="radiocollapse" data-target="#room_none"/>
+                    <strong>{% trans "I want to participate as an individual" %}</strong>
+                </h4>
+            </div>
+        </label>
+        <div id="room_none"
+                class="panel-collapse collapsed {% if selected == "none" %}in{% endif %}">
+            <div class="panel-body form-horizontal">
+                {% trans "Alright, you're good to go!" %}
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <label class="accordion-radio">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <input type="radio" name="room_mode" value="join"
+                            data-parent="#room_accordion"
+                            {% if selected == "join" %}checked="checked"{% endif %}
+                            data-toggle="radiocollapse" data-target="#room_join"/>
+                    <strong>{% trans "I want to join an existing room" %}</strong>
+                </h4>
+            </div>
+        </label>
+        <div id="room_join"
+                class="panel-collapse collapsed {% if selected == "join" %}in{% endif %}">
+            <div class="panel-body form-horizontal">
+                {% bootstrap_form join_form layout="checkout" %}
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <label class="accordion-radio">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <input type="radio" name="room_mode" value="create"
+                            data-parent="#room_accordion"
+                            {% if selected == "create" %}checked="checked"{% endif %}
+                            data-toggle="radiocollapse" data-target="#room_create"/>
+                    <strong>{% trans "I want to create a new room" %}</strong>
+                </h4>
+            </div>
+        </label>
+        <div id="room_create"
+                class="panel-collapse collapsed {% if selected == "create" %}in{% endif %}">
+            <div class="panel-body form-horizontal">
+                {% bootstrap_form create_form layout="checkout" %}
+            </div>
+        </div>
+    </div>
+</div>

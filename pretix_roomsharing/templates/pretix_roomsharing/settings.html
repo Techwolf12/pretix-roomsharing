@@ -9,7 +9,8 @@
         {% csrf_token %}
         <fieldset>
             {% bootstrap_form_errors form %}
-            {% bootstrap_field form.roomsharing__list layout="control" %}
+            {% bootstrap_field form.roomsharing__products layout="control" %}
+            {% bootstrap_field form.roomsharing__questions layout="control" %}
         </fieldset>
         <div class="form-group submit-group">
             <button type="submit" class="btn btn-primary btn-save">

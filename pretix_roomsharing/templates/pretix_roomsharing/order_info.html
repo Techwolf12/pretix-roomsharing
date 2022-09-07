@@ -1,0 +1,35 @@
+{% load i18n %}
+{% load eventurl %}
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            {% trans "Roomsharing" %}
+        </h3>
+    </div>
+    <div class="panel-body">
+        {% if room %}
+            <p>
+                {% blocktrans trimmed with room=room.name %}
+                    You are taking part in the roomshare as part of the room <strong>{{ room }}</strong>.
+                {% endblocktrans %}
+
+            </p>
+            {% if is_admin %}
+                <p>
+                    {% trans "You have created this room. Your fellow room members are:" %}
+                </p>
+                <ul>
+                    {% for f in fellows %}
+                        <li>{{ f.attendee_name }}</li>
+                    {% empty %}
+                        <li><em>{% trans "Nobody has joined your room yet. Go tell your friends about it!" %}</em></li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% else %}
+            <p>
+                {% trans "You are taking part in the room share as an individual." %}
+            </p>
+        {% endif %}
+    </div>
+</div>

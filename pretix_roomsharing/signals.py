@@ -7,6 +7,7 @@ from pretix.base.services.cart import CartError
 from pretix.base.settings import settings_hierarkey
 from pretix.base.signals import order_approved, validate_cart
 from pretix.control.signals import nav_event_settings
+from pretix.base.models import Event, Question, QuestionAnswer
 import logging
 import json
 
@@ -31,7 +32,8 @@ def navbar_settings(sender, request, **kwargs):
     ]
 
 # Once the order gets approved, add a registration ID to the order
-@receiver(order_approved, dispatch_uid="pretix_roomsharing")
-def order_approved(request, *args, **kwargs):
+#@receiver(order_approved, dispatch_uid="pretix_roomsharing")
+#def order_approved(request, *args, **kwargs):
     # TODO Set order's reg ID
-    logger.info("order_approved: "+ json.dumps(dir(request)) + " - " + json.dumps(dir(args)) + " - " + json.dumps(dir(kwargs)))
+    # max(QuestionAnswer.objects.get(question = )) # TODO Get highest current ID or 1
+#    logger.info("order_approved: ")

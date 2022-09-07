@@ -1,0 +1,85 @@
+{% extends "pretixpresale/event/base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load eventurl %}
+{% block title %}{% trans "Change room" %}{% endblock %}
+{% block content %}
+    <h2>{% trans "Change room" %}</h2>
+    {% if room %}
+        <form method="post">
+            {% csrf_token %}
+            <fieldset>
+                <legend>{% trans "Your room membership" %}</legend>
+                <p>
+                    {% blocktrans trimmed with room=room.name %}
+                        You are taking part in the roomshare as part of the room <strong>{{ room }}</strong>.
+                    {% endblocktrans %}
+                </p>
+                <p>
+                    {% blocktrans trimmed %}
+                        You need to leave this room before you can join or create a new one.
+                    {% endblocktrans %}
+                </p>
+                {% if is_admin %}
+                    <div class="alert alert-warning">
+                        {% blocktrans trimmed %}
+                            You are the creator of this room. If you leave it, nobody will be able to change the
+                            password any more.
+                        {% endblocktrans %}
+                    </div>
+                {% endif %}
+                <p>
+                    <button name="room_mode" value="leave" class="btn btn-danger btn-lg">
+                        {% trans "Leave room" %}
+                    </button>
+                </p>
+            </fieldset>
+        </form>
+        {% if is_admin %}
+            <form method="post">
+                {% csrf_token %}
+                <fieldset class="form-horizontal">
+                    <legend>{% trans "Change room password" %}</legend>
+                    {% bootstrap_form change_form layout="checkout" %}
+                    <div class="form-group">
+                        <div class="col-md-9 col-md-offset-3">
+                            <button class="btn btn-primary btn-lg" type="submit" value="change" name="room_mode">
+                                {% trans "Save" %}
+                            </button>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        {% endif %}
+        <div class="row checkout-button-row">
+            <div class="col-md-4">
+                <a class="btn btn-block btn-default btn-lg"
+                        href="{% eventurl request.event "presale:event.order" secret=order.secret order=order.code %}">
+                    {% trans "Go back" %}
+                </a>
+            </div>
+            <div class="col-md-4 col-md-offset-4">
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    {% else %}
+        <form method="post">
+            {% csrf_token %}
+            {% include "pretix_rooms/fragment_roomform.html" %}
+            <div class="row checkout-button-row">
+                <div class="col-md-4">
+                    <a class="btn btn-block btn-default btn-lg"
+                            href="{% eventurl request.event "presale:event.order" secret=order.secret order=order.code %}">
+                        {% trans "Go back" %}
+                    </a>
+                </div>
+                <div class="col-md-4 col-md-offset-4">
+                    <button class="btn btn-block btn-primary btn-lg" type="submit">
+                        {% trans "Continue" %}
+                    </button>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </form>
+    {% endif %}
+{% endblock %}
