@@ -77,7 +77,7 @@ class SettingsView(EventSettingsViewMixin, EventSettingsFormView):
 
     def get_success_url(self):
         return reverse(
-            "plugins:pretix_roomsharing:roomsharing__settings",
+            "plugins:pretix_roomsharing:control.room.settings",
             kwargs={
                 "organizer": self.request.event.organizer.slug,
                 "event": self.request.event.slug,
@@ -119,7 +119,7 @@ class OrderRoomChange(EventViewMixin, OrderDetailMixin, TemplateView):
             messages.error(request, _('The room for this order cannot be changed.'))
             return redirect(self.get_order_url())
 
-        if self.order.status not in (Order.STATUS_PENDING, Order.STATUS_EXPIRED, Order.STATUS_PAID):
+        if self.order.status not in (Order.STATUS_CANCELED, Order.STATUS_EXPIRED):
             messages.error(request, _('The room for this order cannot be changed.'))
             return redirect(self.get_order_url())
 
@@ -254,7 +254,7 @@ class ControlRoomForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super().__init__(*args, **kwargs)
-        self.fields['room'].queryset = self.event.rooms.all()
+        self.fields['room'].queryset = self.event.room.all()
 
 
 class ControlRoomChange(OrderView):
@@ -319,7 +319,7 @@ class RoomForm(forms.ModelForm):
 class RoomDetail(EventPermissionRequiredMixin, UpdateView):
     permission = 'can_change_orders'
     template_name = 'pretix_roomsharing/control_detail.html'
-    context_object_name = 'room'
+    context_object_name = 'rooms'
     form_class = RoomForm
 
     def get_queryset(self):
@@ -329,7 +329,7 @@ class RoomDetail(EventPermissionRequiredMixin, UpdateView):
         form.save()
         form.instance.log_action("pretix_roomsharing.room.changed", data=form.cleaned_data, user=self.request.user)
         messages.success(self.request, _('Great, we saved your changes!'))
-        return redirect(reverse('plugins:pretix_roomsharing:event.rooms.list', kwargs={
+        return redirect(reverse('plugins:pretix_roomsharing:event.room.list', kwargs={
             'organizer': self.request.organizer.slug,
             'event': self.request.event.slug,
         }))
@@ -343,7 +343,7 @@ class RoomDetail(EventPermissionRequiredMixin, UpdateView):
 class RoomDelete(EventPermissionRequiredMixin, DeleteView):
     permission = 'can_change_orders'
     template_name = 'pretix_roomsharing/control_delete.html'
-    context_object_name = 'room'
+    context_object_name = 'rooms'
 
     def get_queryset(self):
         return self.request.event.rooms.all()
@@ -366,7 +366,7 @@ class RoomDelete(EventPermissionRequiredMixin, DeleteView):
             oc.delete()
         o.delete()
         messages.success(self.request, _('The room has been deleted.'))
-        return redirect(reverse('plugins:pretix_roomsharing:event.rooms.list', kwargs={
+        return redirect(reverse('plugins:pretix_roomsharing:event.room.list', kwargs={
             'organizer': self.request.organizer.slug,
             'event': self.request.event.slug,
         }))

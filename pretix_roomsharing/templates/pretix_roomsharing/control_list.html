@@ -28,16 +28,16 @@
                     <tr>
                         <td>
                             <strong>
-                                <a href="{% url "plugins:pretix_rooms:event.rooms.detail" event=request.event.slug organizer=request.event.organizer.slug pk=c.pk %}">
+                                <a href="{% url "plugins:pretix_roomsharing:event.room.detail" event=request.event.slug organizer=request.event.organizer.slug pk=c.pk %}">
                                     {{ c.name }}
                                 </a>
                             </strong>
                         </td>
                         <td class="text-right">
-                            <a href="{% url "plugins:pretix_rooms:event.rooms.detail" event=request.event.slug organizer=request.event.organizer.slug pk=c.pk %}" class="btn btn-default">
+                            <a href="{% url "plugins:pretix_roomsharing:event.room.detail" event=request.event.slug organizer=request.event.organizer.slug pk=c.pk %}" class="btn btn-default">
                                 <span class="fa fa-edit"></span>
                             </a>
-                            <a href="{% url "plugins:pretix_rooms:event.rooms.delete" event=request.event.slug organizer=request.event.organizer.slug pk=c.pk %}" class="btn btn-danger">
+                            <a href="{% url "plugins:pretix_roomsharing:event.room.delete" event=request.event.slug organizer=request.event.organizer.slug pk=c.pk %}" class="btn btn-danger">
                                 <span class="fa fa-trash"></span>
                             </a>
                         </td>

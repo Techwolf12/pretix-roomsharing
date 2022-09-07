@@ -47,13 +47,6 @@ class RoomCreateForm(forms.Form):
                 code='required'
             )
 
-        password = self.cleaned_data.get('password')
-        if not password:
-            raise forms.ValidationError(
-                self.error_messages['required'],
-                code='required'
-            )
-
         if Room.objects.filter(event=self.event, name=name).exclude(pk=(self.room.pk if self.room else 0)).exists():
             raise forms.ValidationError(
                 self.error_messages['duplicate_name'],
@@ -61,6 +54,16 @@ class RoomCreateForm(forms.Form):
             )
         return name
 
+    def clean_password(self): 
+        password = self.cleaned_data.get('password')
+
+        if not password:
+            raise forms.ValidationError(
+                self.error_messages['required'],
+                code='required'
+            )
+
+        return password
 
 class RoomJoinForm(forms.Form):
     error_messages = {
