@@ -1,0 +1,1 @@
+# TODO: Can we add a settings field to a product (eg. room sharing enabled for this product, max people in room for this product). Could also help with validating if you got the same room type

@@ -11,6 +11,7 @@ from pretix.presale.views.cart import cart_session
 
 from .models import Room
 
+# TODO Only show form if a roomshare available product is bought
 
 class RoomCreateForm(forms.Form):
     error_messages = {
@@ -265,6 +266,7 @@ class RoomStep(CartMixin, TemplateFlowStep):
                     .distinct()
                 )
                 # TODO: Validation of same room type
+                # TODO: Validation of max room quantity?
                 if room_subevents:
                     cart_subevents = set(
                         c["subevent"]

@@ -3,7 +3,7 @@
 {% load money %}
 {% load bootstrap3 %}
 {% block inner %}
-    <p>{% trans "TODO Explain rooms" %}</p>
+    <p>{% trans "Rooms allow you to share a room together with other attendees, you can create or join a room group now and share this with your friends. Please keep in mind that if you use a day ticket you will have to set this to random if you want your order to be accepted" %}</p>
     <form method="post">
         {% csrf_token %}
         {% include "pretix_roomsharing/fragment_roomform.html" %}

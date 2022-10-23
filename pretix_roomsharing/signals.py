@@ -1,5 +1,4 @@
 # Register your receivers here
-import json
 import logging
 from django import forms
 from django.dispatch import receiver
@@ -60,15 +59,6 @@ def navbar_settings(sender, request, **kwargs):
         }
     ]
 
-
-# Once the order gets approved, add a registration ID to the order
-# @receiver(order_approved, dispatch_uid="pretix_roomsharing")
-# def order_approved(request, *args, **kwargs):
-# TODO Set order's reg ID
-# max(QuestionAnswer.objects.get(question = )) # TODO Get highest current ID or 1
-#    logger.info("order_approved: ")
-
-
 @receiver(order_meta_from_request, dispatch_uid="room_order_meta")
 def order_meta_signal(sender: Event, request: HttpRequest, **kwargs):
     cs = cart_session(request)
@@ -85,6 +75,7 @@ def placed_order(sender: Event, order: Order, **kwargs):
         try:
             c = sender.rooms.get(pk=order.meta_info_data["room_create"])
         except Room.DoesNotExist:
+            logger.error("Room did not exist in room creation, can't add user to room")
             return
         else:
             c.orderrooms.create(order=order, is_admin=True)

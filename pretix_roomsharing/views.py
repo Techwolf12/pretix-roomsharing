@@ -1,6 +1,5 @@
 import base64
 import hmac
-import json
 import logging
 from collections import defaultdict
 from django import forms
@@ -13,7 +12,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _, pgettext_lazy
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import DeleteView, FormView, ListView, TemplateView
@@ -31,7 +30,6 @@ from pretix.base.models import (
 )
 from pretix.base.views.metrics import unauthed_response
 from pretix.base.views.tasks import AsyncAction
-from pretix.control.forms.widgets import Select2
 from pretix.control.permissions import EventPermissionRequiredMixin
 from pretix.control.views import UpdateView
 from pretix.control.views.event import EventSettingsFormView, EventSettingsViewMixin
@@ -78,6 +76,7 @@ class SettingsView(EventSettingsViewMixin, EventSettingsFormView):
     form_class = RoomsharingSettingsForm
     template_name = "pretix_roomsharing/settings.html"
     permission = "can_change_settings"
+    # TODO: Set user public name field
 
     def get_success_url(self):
         return reverse(
