@@ -29,6 +29,7 @@ from pretix.presale.signals import (
     order_meta_from_request,
 )
 from pretix.presale.views.cart import cart_session
+from django.core import serializers
 
 from .checkoutflow import RoomStep
 from .models import OrderRoom, Room
@@ -118,15 +119,18 @@ def order_info(sender: Event, order: Order, **kwargs):
         "order": order,
         "event": sender,
     }
+    
     try:
         c = order.orderroom
-        ctx["room"] = c.room
-        ctx["is_admin"] = c.is_admin
-        ctx["fellows"] = OrderPosition.objects.filter(
+        fellows_orders = OrderPosition.objects.filter(
             order__status__in=(Order.STATUS_PENDING, Order.STATUS_PAID),
             order__orderroom__room=c.room,
             item__admission=True,
         ).exclude(order=order)
+
+        ctx["room"] = c.room
+        ctx["is_admin"] = c.is_admin
+        ctx["fellows"] = fellows_orders
     except OrderRoom.DoesNotExist:
         pass
 

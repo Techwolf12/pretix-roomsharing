@@ -31,7 +31,7 @@
             </p>
                 <ul>
                     {% for f in fellows %}
-                        <li>{{ f.attendee_name }}</li>
+                    <li>{{ f.order.code }}</li>
                     {% empty %}
                         <li><em>{% trans "Nobody has joined your room yet. Go tell your friends about it!" %}</em></li>
                     {% endfor %}

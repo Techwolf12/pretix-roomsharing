@@ -66,7 +66,7 @@ class RoomsharingSettingsForm(SettingsForm):
         self.fields["roomsharing__products"].choices = choices
         questionChoices = (
             (str(i["identifier"]), i["question"])
-            for i in Question.objects.values("question", "identifier").all()
+            for i in Question.objects.filter(event=event).values("question", "identifier").all()
         )
         self.fields["roomsharing__questions"].choices = questionChoices
 
