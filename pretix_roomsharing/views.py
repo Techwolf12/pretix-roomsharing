@@ -49,13 +49,6 @@ class RoomsharingSettingsForm(SettingsForm):
         widget=CheckboxSelectMultiple,
     )
 
-    roomsharing__questions = forms.ChoiceField(
-        choices=[],
-        label=_("What is the Roomsharing name question?"),
-        required=False,
-        widget=RadioSelect,
-    )
-
     def __init__(self, *args, **kwargs):
         event = kwargs.get("obj")
         super().__init__(*args, **kwargs)
@@ -63,12 +56,10 @@ class RoomsharingSettingsForm(SettingsForm):
         choices = (
             (str(i["id"]), i["name"]) for i in event.items.values("name", "id").all()
         )
+
         self.fields["roomsharing__products"].choices = choices
-        questionChoices = (
-            (str(i["identifier"]), i["question"])
-            for i in Question.objects.filter(event=event).values("question", "identifier").all()
-        )
-        self.fields["roomsharing__questions"].choices = questionChoices
+        self.fields["roomsharing__products"].initial = event.settings.roomsharing__products
+
 
 
 class SettingsView(EventSettingsViewMixin, EventSettingsFormView):

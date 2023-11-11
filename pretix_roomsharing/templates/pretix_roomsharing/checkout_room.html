@@ -5,12 +5,34 @@
 {% block inner %}
     <p>
         {% trans "You will share a room together with other attendees. You can create or join a rooming group. Please share this information with the friends, that you want to room with!" %}
-        <br />
-        {% trans "Keep in mind that, if you want to buy a day ticket, this needs to be set on 'I want to be assigned a random room' to accept your order."
     </p>
     <form method="post">
         {% csrf_token %}
+        {% if order_has_room %}
         {% include "pretix_roomsharing/fragment_roomform.html" %}
+        {% else %}
+        <div class="panel-group" id="room_accordion">
+            <div class="panel panel-default">
+                <label class="accordion-radio">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <input type="radio" name="room_mode" value="none"
+                                    data-parent="#room_accordion"
+                                    {% if selected == "none" %}checked="checked"{% endif %}
+                                    data-toggle="radiocollapse" data-target="#room_none"/>
+                            <strong>{% trans "No room types in order" %}</strong>
+                        </h4>
+                    </div>
+                </label>
+                <div id="room_none"
+                        class="panel-collapse collapsed {% if selected == "none" %}in{% endif %}">
+                    <div class="panel-body form-horizontal">
+                        {% trans "Your ticket doesn't grant you a room, so there is nothing for you to do here. Press continue to keep going!" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
         <div class="row checkout-button-row">
             <div class="col-md-4">
                 <a class="btn btn-block btn-default btn-lg"

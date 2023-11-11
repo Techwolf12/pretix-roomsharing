@@ -11,8 +11,6 @@ from pretix.presale.views.cart import cart_session
 
 from .models import Room
 
-# TODO Only show form if a roomshare available product is bought
-
 class RoomCreateForm(forms.Form):
     error_messages = {
         "duplicate_name": _(
@@ -206,7 +204,7 @@ class RoomStep(CartMixin, TemplateFlowStep):
             if self.request.method == "POST"
             and self.request.POST.get("room_mode") == "create"
             else None,
-        )
+        ) 
 
     @cached_property
     def join_form(self):
@@ -245,6 +243,12 @@ class RoomStep(CartMixin, TemplateFlowStep):
         ctx["join_form"] = self.join_form
         ctx["cart"] = self.get_cart()
         ctx["selected"] = self.cart_session.get("room_mode", "")
+        order_has_room = False
+        for cartPosition in self.get_cart()["positions"]:
+            if str(cartPosition.item.id) in self.request.event.settings.roomsharing__products:
+                order_has_room = True
+        
+        ctx["order_has_room"] = order_has_room
         return ctx
 
     def is_completed(self, request, warn=False):
