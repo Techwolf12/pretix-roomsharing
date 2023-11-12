@@ -18,7 +18,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import FormView, ListView, TemplateView
 from django_scopes import scopes_disabled
 from i18nfield.forms import I18nFormField, I18nTextInput
-from pretix import settings
+from django.conf import settings
 from pretix.base.forms import SettingsForm
 from pretix.base.models import (
     Event,
