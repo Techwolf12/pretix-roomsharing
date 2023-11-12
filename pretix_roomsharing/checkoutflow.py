@@ -11,6 +11,7 @@ from pretix.presale.views.cart import cart_session
 
 from .models import Room
 
+
 class RoomCreateForm(forms.Form):
     error_messages = {
         "duplicate_name": _(
@@ -204,7 +205,7 @@ class RoomStep(CartMixin, TemplateFlowStep):
             if self.request.method == "POST"
             and self.request.POST.get("room_mode") == "create"
             else None,
-        ) 
+        )
 
     @cached_property
     def join_form(self):
@@ -247,7 +248,7 @@ class RoomStep(CartMixin, TemplateFlowStep):
         for cartPosition in self.get_cart()["positions"]:
             if str(cartPosition.item.id) in self.request.event.settings.roomsharing__products:
                 order_has_room = True
-        
+
         ctx["order_has_room"] = order_has_room
         return ctx
 
@@ -280,9 +281,11 @@ class RoomStep(CartMixin, TemplateFlowStep):
                         if warn:
                             messages.warning(
                                 request,
-                                _(
-                                    'You requested to join a room that participates in "{subevent_room}", while you chose to participate in "{subevent_cart}". Please choose a different room.'
-                                ).format(
+                                _('''
+                                    You requested to join a room that participates in "{subevent_room}",
+                                    while you chose to participate in "{subevent_cart}".
+                                    Please choose a different room.
+                                ''').format(
                                     subevent_room=SubEvent.objects.get(
                                         pk=list(room_subevents)[0]
                                     ).name,

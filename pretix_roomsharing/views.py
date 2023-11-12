@@ -3,10 +3,11 @@ import hmac
 import logging
 from collections import defaultdict
 from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Count, Exists, OuterRef
-from django.forms.widgets import CheckboxSelectMultiple, RadioSelect
+from django.forms.widgets import CheckboxSelectMultiple
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -15,29 +16,19 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.clickjacking import xframe_options_exempt
-from django.views.generic import FormView, ListView, TemplateView
+from django.views.generic import ListView, TemplateView
 from django_scopes import scopes_disabled
-from i18nfield.forms import I18nFormField, I18nTextInput
-from django.conf import settings
 from pretix.base.forms import SettingsForm
-from pretix.base.models import (
-    Event,
-    Order,
-    OrderPosition,
-    OrderRefund,
-    Question,
-    SubEvent,
-)
+from pretix.base.models import Event, Order, OrderPosition, OrderRefund
 from pretix.base.views.metrics import unauthed_response
-from pretix.base.views.tasks import AsyncAction
 from pretix.control.permissions import EventPermissionRequiredMixin
 from pretix.control.views import UpdateView
 from pretix.control.views.event import EventSettingsFormView, EventSettingsViewMixin
 from pretix.control.views.orders import OrderView
+from pretix.helpers.compat import CompatDeleteView
 from pretix.multidomain.urlreverse import eventreverse
 from pretix.presale.views import EventViewMixin
 from pretix.presale.views.order import OrderDetailMixin
-from pretix.helpers.compat import CompatDeleteView
 
 logger = logging.getLogger(__name__)
 
@@ -59,8 +50,7 @@ class RoomsharingSettingsForm(SettingsForm):
         )
 
         self.fields["roomsharing__products"].choices = choices
-        self.fields["roomsharing__products"].initial = event.settings.roomsharing__products
-
+        self.initial["roomsharing__products"] = event.settings.roomsharing__products
 
 
 class SettingsView(EventSettingsViewMixin, EventSettingsFormView):
