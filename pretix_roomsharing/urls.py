@@ -22,27 +22,27 @@ urlpatterns = [
         ControlRoomChange.as_view(),
         name="control.order.room.modify",
     ),
-    url(
+    path(
         r"control/event/<str:organizer>/<str:event>/rooms/stats/",
         StatsView.as_view(),
         name="event.stats",
     ),
-    url(
+    path(
         r"control/event/<str:organizer>/<str:event>/rooms/",
         RoomList.as_view(),
         name="event.room.list",
     ),
-    url(
+    path(
         r"control/event/<str:organizer>/<str:event>/rooms/<int:pk>/",
         RoomDetail.as_view(),
         name="event.room.detail",
     ),
-    url(
+    path(
         r"control/event/<str:organizer>/<str:event>/rooms/<int:pk>/delete",
         RoomDelete.as_view(),
         name="event.room.delete",
     ),
-    url(
+    path(
         r"metrics/rooms/<str:organizer>/<str:event>/",
         MetricsView.as_view(),
         name="metrics",
