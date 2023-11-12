@@ -246,7 +246,10 @@ class RoomStep(CartMixin, TemplateFlowStep):
         ctx["selected"] = self.cart_session.get("room_mode", "")
         order_has_room = False
         for cartPosition in self.get_cart()["positions"]:
-            if str(cartPosition.item.id) in self.request.event.settings.roomsharing__products:
+            if (
+                str(cartPosition.item.id)
+                in self.request.event.settings.roomsharing__products
+            ):
                 order_has_room = True
 
         ctx["order_has_room"] = order_has_room
@@ -281,11 +284,13 @@ class RoomStep(CartMixin, TemplateFlowStep):
                         if warn:
                             messages.warning(
                                 request,
-                                _('''
+                                _(
+                                    """
                                     You requested to join a room that participates in "{subevent_room}",
                                     while you chose to participate in "{subevent_cart}".
                                     Please choose a different room.
-                                ''').format(
+                                """
+                                ).format(
                                     subevent_room=SubEvent.objects.get(
                                         pk=list(room_subevents)[0]
                                     ).name,
