@@ -15,7 +15,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.clickjacking import xframe_options_exempt
-from django.views.generic import DeleteView, FormView, ListView, TemplateView
+from django.views.generic import FormView, ListView, TemplateView
 from django_scopes import scopes_disabled
 from i18nfield.forms import I18nFormField, I18nTextInput
 from pretix import settings
@@ -37,6 +37,7 @@ from pretix.control.views.orders import OrderView
 from pretix.multidomain.urlreverse import eventreverse
 from pretix.presale.views import EventViewMixin
 from pretix.presale.views.order import OrderDetailMixin
+from pretix.helpers.compat import CompatDeleteView
 
 logger = logging.getLogger(__name__)
 
@@ -364,7 +365,7 @@ class RoomDetail(EventPermissionRequiredMixin, UpdateView):
         return ctx
 
 
-class RoomDelete(EventPermissionRequiredMixin, DeleteView):
+class RoomDelete(EventPermissionRequiredMixin, CompatDeleteView):
     permission = "can_change_orders"
     template_name = "pretix_roomsharing/control_delete.html"
     context_object_name = "rooms"
