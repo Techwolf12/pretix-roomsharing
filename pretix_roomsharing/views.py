@@ -50,7 +50,7 @@ class RoomsharingSettingsForm(SettingsForm):
         )
 
         self.fields["roomsharing__products"].choices = choices
-        self.initial["roomsharing__products"] = event.settings.roomsharing__products
+        #self.initial["roomsharing__products"] = event.settings.roomsharing__products
 
 
 class SettingsView(EventSettingsViewMixin, EventSettingsFormView):
