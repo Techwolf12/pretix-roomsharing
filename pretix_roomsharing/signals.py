@@ -119,10 +119,18 @@ def order_info(sender: Event, order: Order, **kwargs):
             order__orderroom__room=c.room,
             item__admission=True,
         ).exclude(order=order)
+        order_has_room = False
+        for orderPosition in order.positions.all():
+            if (
+                str(orderPosition.item.id)
+                in sender.settings.roomsharing__products
+            ):
+                order_has_room = True
 
         ctx["room"] = c.room
         ctx["is_admin"] = c.is_admin
         ctx["fellows"] = fellows_orders
+        ctx["order_has_room"] = order_has_room
     except OrderRoom.DoesNotExist:
         pass
 

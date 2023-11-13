@@ -2,12 +2,14 @@
 {% load eventurl %}
 <div class="panel panel-primary">
     <div class="panel-heading">
+        {% if order_has_room %}
         <div class="pull-right">
             <a href="{% eventurl event "plugins:pretix_roomsharing:event.order.room.modify" secret=order.secret order=order.code %}">
                 <span class="fa fa-edit"></span>
                 {% trans "Change details" %}
             </a>
         </div>
+        {% endif %}
         <h3 class="panel-title">
             {% trans "Roomsharing" %}
         </h3>
@@ -38,7 +40,7 @@
                 </ul>
         {% else %}
             <p>
-                {% trans "You will be randomly assigned a room." %}
+                {% trans "You will be randomly assigned a room or you have a ticket type without a room." %}
             </p>
         {% endif %}
     </div>
