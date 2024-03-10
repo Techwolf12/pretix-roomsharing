@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 class RoomsharingSettingsForm(SettingsForm):
-    roomsharing__products = forms.MultipleChoiceField(
+    roomsharing__products = forms.ModelMultipleChoiceField(
         choices=[],
         label=_("Roomsharing products"),
         required=False,

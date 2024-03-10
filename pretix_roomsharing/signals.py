@@ -7,6 +7,7 @@ from django.template.loader import get_template
 from django.urls import resolve, reverse
 from django.utils.translation import gettext_lazy as _
 from pretix.base.models import Event, Order, OrderPosition
+from pretix.base.settings import settings_hierarkey
 from pretix.base.signals import logentry_display, order_placed
 from pretix.control.forms.filter import FilterForm
 from pretix.control.signals import (
@@ -232,3 +233,5 @@ try:
 
 except ImportError:
     pass
+
+settings_hierarkey.add_default('roomsharing__products', None, list)
