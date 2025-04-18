@@ -14,3 +14,8 @@ def sum_filter(value):
         )
 
     return sum(value)
+
+
+@register.filter(name="startswith")
+def startswith(value, prefix):
+    return value.startswith(prefix)

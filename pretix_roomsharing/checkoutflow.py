@@ -29,9 +29,9 @@ class RoomCreateForm(forms.Form):
     password = forms.CharField(
         max_length=190,
         label=_("Room password"),
-        min_length=3, 
+        min_length=3,
         widget=forms.PasswordInput,
-        required=False
+        required=False,
     )
 
     def __init__(self, *args, **kwargs):
@@ -205,10 +205,12 @@ class RoomStep(CartMixin, TemplateFlowStep):
             prefix="create",
             initial=initial,
             current=current,
-            data=self.request.POST
-            if self.request.method == "POST"
-            and self.request.POST.get("room_mode") == "create"
-            else None,
+            data=(
+                self.request.POST
+                if self.request.method == "POST"
+                and self.request.POST.get("room_mode") == "create"
+                else None
+            ),
         )
 
     @cached_property
@@ -232,10 +234,12 @@ class RoomStep(CartMixin, TemplateFlowStep):
             event=self.event,
             prefix="join",
             initial=initial,
-            data=self.request.POST
-            if self.request.method == "POST"
-            and self.request.POST.get("room_mode") == "join"
-            else None,
+            data=(
+                self.request.POST
+                if self.request.method == "POST"
+                and self.request.POST.get("room_mode") == "join"
+                else None
+            ),
         )
 
     @cached_property
@@ -269,6 +273,64 @@ class RoomStep(CartMixin, TemplateFlowStep):
                 room = Room.objects.get(
                     event=self.event, pk=cart_session(request)["room_join"]
                 )
+                # Validation of max people
+                if self.request.event.settings.roomsharing__check_max_people:
+                    max_people = None
+                    for cartPosition in self.get_cart()["positions"]:
+                        item_id = str(cartPosition.item.id)
+                        max_people_setting_key = f"roomsharing__max_people_{item_id}"
+                        if max_people_setting_key in self.request.event.settings:
+                            max_people = self.request.event.settings[
+                                max_people_setting_key
+                            ]
+                            break
+
+                    if max_people is not None and len(room.orderrooms.all()) >= int(
+                        max_people
+                    ):
+                        if warn:
+                            messages.warning(
+                                request,
+                                _(
+                                    """
+                                    The room you requested to join is already full.
+                                    Please choose a different room.
+                                """
+                                ),
+                            )
+                        return False
+                # Validation of ticket type
+                if self.request.event.settings.roomsharing__check_ticket_type:
+                    room_ticket_types = set(
+                        c["order__all_positions__item"]
+                        for c in room.orderrooms.filter(
+                            order__all_positions__canceled=False
+                        )
+                        .values("order__all_positions__item")
+                        .distinct()
+                    )
+                    cart_ticket_types = set(
+                        c["item"] for c in get_cart(request).values("item").distinct()
+                    )
+                    if any(c not in room_ticket_types for c in cart_ticket_types):
+                        if warn:
+                            messages.warning(
+                                request,
+                                _(
+                                    """
+                                    You requested to join a room that participates in "{room_ticket_type}",
+                                    while you chose to participate in "{cart_ticket_type}".
+                                    Please choose a different room.
+                                """
+                                ).format(
+                                    room_ticket_type=room.name,
+                                    cart_ticket_type=SubEvent.objects.get(
+                                        pk=list(cart_ticket_types)[0]
+                                    ).name,
+                                ),
+                            )
+                        return False
+
                 room_subevents = set(
                     c["order__all_positions__subevent"]
                     for c in room.orderrooms.filter(
@@ -277,8 +339,6 @@ class RoomStep(CartMixin, TemplateFlowStep):
                     .values("order__all_positions__subevent")
                     .distinct()
                 )
-                # TODO: Validation of same room type
-                # TODO: Validation of max room quantity?
                 if room_subevents:
                     cart_subevents = set(
                         c["subevent"]
