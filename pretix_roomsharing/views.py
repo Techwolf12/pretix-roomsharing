@@ -41,16 +41,44 @@ class RoomsharingSettingsForm(SettingsForm):
         widget=CheckboxSelectMultiple,
     )
 
+    roomsharing__validation_options = forms.MultipleChoiceField(
+        choices=[
+            ("check_max_people", _("Check if the room has the same maximum number of people")),
+            ("check_ticket_type", _("Check if the room type is the same ticket type")),
+        ],
+        label=_("Validation Options"),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
+
     def __init__(self, *args, **kwargs):
         event = kwargs.get("obj")
         super().__init__(*args, **kwargs)
 
-        choices = (
-            (str(i["id"]), i["name"]) for i in event.items.values("name", "id").all()
-        )
-
+        choices = [(str(i["id"]), i["name"]) for i in event.items.values("name", "id").all()]
         self.fields["roomsharing__products"].choices = choices
-        #self.initial["roomsharing__products"] = event.settings.roomsharing__products
+
+        for item_id, item_name in choices:
+            field_name = f"roomsharing__max_people_{item_id}"
+            self.fields[field_name] = forms.IntegerField(
+                label=f"Max people for {item_name}",
+                required=False,
+                initial=1,
+            )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        selected_products = cleaned_data.get("roomsharing__products", [])
+
+        for item_id in selected_products:
+            field_name = f"roomsharing__max_people_{item_id}"
+            max_people = cleaned_data.get(field_name)
+
+        if max_people is not None:
+            if max_people <= 0:
+                self.add_error(field_name, "The maximum number of people must be a positive integer.")
+
+        return cleaned_data
 
 
 class SettingsView(EventSettingsViewMixin, EventSettingsFormView):

@@ -11,6 +11,12 @@
             {% bootstrap_form_errors form %}
             <p>{% trans "Selecting a product here requires room shares to be the same product. You can get around this by using bundled products and selecting one of those here." %}</p>
             {% bootstrap_field form.roomsharing__products layout="control" %}
+            {% for field in form %}
+                {% if field.name.startswith "roomsharing__max_people_" %}
+                    {% bootstrap_field field layout="control" %}
+                {% endif %}
+            {% endfor %}
+            {% bootstrap_field form.roomsharing__validation_options layout="control" %}
         </fieldset>
         <div class="form-group submit-group">
             <button type="submit" class="btn btn-primary btn-save">

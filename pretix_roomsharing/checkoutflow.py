@@ -277,8 +277,62 @@ class RoomStep(CartMixin, TemplateFlowStep):
                     .values("order__all_positions__subevent")
                     .distinct()
                 )
-                # TODO: Validation of same room type
-                # TODO: Validation of max room quantity?
+                # Validation of max people
+                if "check_max_people" in self.request.event.settings.roomsharing__validation_option:
+                    max_people = None
+                    for cartPosition in self.get_cart()["positions"]:
+                        item_id = str(cartPosition.item.id)
+                        max_people_setting_key = f"roomsharing__max_people_{item_id}"
+                        if max_people_setting_key in self.request.event.settings:
+                            max_people = self.request.event.settings[max_people_setting_key]
+                            break
+
+                    if max_people is not None and len(room.orderrooms.all()) >= int(max_people):
+                        if warn:
+                            messages.warning(
+                                request,
+                                _(
+                                    """
+                                    The room you requested to join is already full.
+                                    Please choose a different room.
+                                """
+                                ),
+                            )
+                        return False
+                
+                # Validation of ticket type
+                if "check_ticket_type" in self.request.event.settings.roomsharing__validation_option:
+                    room_ticket_types = set(
+                        c["order__all_positions__item"]
+                        for c in room.orderrooms.filter(
+                            order__all_positions__canceled=False
+                        )
+                        .values("order__all_positions__item")
+                        .distinct()
+                    )
+                    cart_ticket_types = set(
+                        c["item"]
+                        for c in get_cart(request).values("item").distinct()
+                    )
+                    if any(c not in room_ticket_types for c in cart_ticket_types):
+                        if warn:
+                            messages.warning(
+                                request,
+                                _(
+                                    """
+                                    You requested to join a room that participates in "{room_ticket_type}",
+                                    while you chose to participate in "{cart_ticket_type}".
+                                    Please choose a different room.
+                                """
+                                ).format(
+                                    room_ticket_type=room.name,
+                                    cart_ticket_type=SubEvent.objects.get(
+                                        pk=list(cart_ticket_types)[0]
+                                    ).name,
+                                ),
+                            )
+                        return False
+
                 if room_subevents:
                     cart_subevents = set(
                         c["subevent"]
