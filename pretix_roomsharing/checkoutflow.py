@@ -27,7 +27,11 @@ class RoomCreateForm(forms.Form):
         required=False,
     )
     password = forms.CharField(
-        max_length=190, label=_("Room password"), min_length=3, required=False
+        max_length=190,
+        label=_("Room password"),
+        min_length=3, 
+        widget=forms.PasswordInput,
+        required=False
     )
 
     def __init__(self, *args, **kwargs):
