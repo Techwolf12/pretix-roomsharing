@@ -116,10 +116,7 @@ def order_info(sender: Event, order: Order, **kwargs):
     # Show link for user to change room
     order_has_room = False
     for orderPosition in order.positions.all():
-        if (
-            str(orderPosition.item.id)
-            in sender.settings.roomsharing__products
-        ):
+        if str(orderPosition.item.id) in sender.settings.roomsharing__products:
             order_has_room = True
     ctx["order_has_room"] = order_has_room
 
@@ -237,4 +234,4 @@ try:
 except ImportError:
     pass
 
-settings_hierarkey.add_default('roomsharing__products', None, list)
+settings_hierarkey.add_default("roomsharing__products", None, list)

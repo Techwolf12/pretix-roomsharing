@@ -29,9 +29,9 @@ class RoomCreateForm(forms.Form):
     password = forms.CharField(
         max_length=190,
         label=_("Room password"),
-        min_length=3, 
+        min_length=3,
         widget=forms.PasswordInput,
-        required=False
+        required=False,
     )
 
     def __init__(self, *args, **kwargs):
@@ -205,10 +205,12 @@ class RoomStep(CartMixin, TemplateFlowStep):
             prefix="create",
             initial=initial,
             current=current,
-            data=self.request.POST
-            if self.request.method == "POST"
-            and self.request.POST.get("room_mode") == "create"
-            else None,
+            data=(
+                self.request.POST
+                if self.request.method == "POST"
+                and self.request.POST.get("room_mode") == "create"
+                else None
+            ),
         )
 
     @cached_property
@@ -232,10 +234,12 @@ class RoomStep(CartMixin, TemplateFlowStep):
             event=self.event,
             prefix="join",
             initial=initial,
-            data=self.request.POST
-            if self.request.method == "POST"
-            and self.request.POST.get("room_mode") == "join"
-            else None,
+            data=(
+                self.request.POST
+                if self.request.method == "POST"
+                and self.request.POST.get("room_mode") == "join"
+                else None
+            ),
         )
 
     @cached_property
@@ -278,16 +282,20 @@ class RoomStep(CartMixin, TemplateFlowStep):
                     .distinct()
                 )
                 # Validation of max people
-                if "check_max_people" in self.request.event.settings.roomsharing__validation_option:
+                if self.request.event.settings.roomsharing__check_max_people:
                     max_people = None
                     for cartPosition in self.get_cart()["positions"]:
                         item_id = str(cartPosition.item.id)
                         max_people_setting_key = f"roomsharing__max_people_{item_id}"
                         if max_people_setting_key in self.request.event.settings:
-                            max_people = self.request.event.settings[max_people_setting_key]
+                            max_people = self.request.event.settings[
+                                max_people_setting_key
+                            ]
                             break
 
-                    if max_people is not None and len(room.orderrooms.all()) >= int(max_people):
+                    if max_people is not None and len(room.orderrooms.all()) >= int(
+                        max_people
+                    ):
                         if warn:
                             messages.warning(
                                 request,
@@ -299,9 +307,8 @@ class RoomStep(CartMixin, TemplateFlowStep):
                                 ),
                             )
                         return False
-                
                 # Validation of ticket type
-                if "check_ticket_type" in self.request.event.settings.roomsharing__validation_option:
+                if self.request.event.settings.roomsharing__check_ticket_type:
                     room_ticket_types = set(
                         c["order__all_positions__item"]
                         for c in room.orderrooms.filter(
@@ -311,8 +318,7 @@ class RoomStep(CartMixin, TemplateFlowStep):
                         .distinct()
                     )
                     cart_ticket_types = set(
-                        c["item"]
-                        for c in get_cart(request).values("item").distinct()
+                        c["item"] for c in get_cart(request).values("item").distinct()
                     )
                     if any(c not in room_ticket_types for c in cart_ticket_types):
                         if warn:

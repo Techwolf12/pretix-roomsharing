@@ -41,21 +41,23 @@ class RoomsharingSettingsForm(SettingsForm):
         widget=CheckboxSelectMultiple,
     )
 
-    roomsharing__validation_options = forms.MultipleChoiceField(
-        choices=[
-            ("check_max_people", _("Check if the room has the same maximum number of people")),
-            ("check_ticket_type", _("Check if the room type is the same ticket type")),
-        ],
-        label=_("Validation Options"),
+    roomsharing__check_max_people = forms.BooleanField(
+        label=_("Check if the room has the same maximum number of people"),
         required=False,
-        widget=forms.CheckboxSelectMultiple,
+    )
+
+    roomsharing__check_ticket_type = forms.BooleanField(
+        label=_("Check if the room type is the same ticket type"),
+        required=False,
     )
 
     def __init__(self, *args, **kwargs):
         event = kwargs.get("obj")
         super().__init__(*args, **kwargs)
 
-        choices = [(str(i["id"]), i["name"]) for i in event.items.values("name", "id").all()]
+        choices = [
+            (str(i["id"]), i["name"]) for i in event.items.values("name", "id").all()
+        ]
         self.fields["roomsharing__products"].choices = choices
 
         for item_id, item_name in choices:
@@ -76,7 +78,10 @@ class RoomsharingSettingsForm(SettingsForm):
 
         if max_people is not None:
             if max_people <= 0:
-                self.add_error(field_name, "The maximum number of people must be a positive integer.")
+                self.add_error(
+                    field_name,
+                    "The maximum number of people must be a positive integer.",
+                )
 
         return cleaned_data
 
@@ -226,10 +231,12 @@ class OrderRoomChange(EventViewMixin, OrderDetailMixin, TemplateView):
         return RoomChangePasswordForm(
             event=self.request.event,
             prefix="change",
-            data=self.request.POST
-            if self.request.method == "POST"
-            and self.request.POST.get("room_mode") == "change"
-            else None,
+            data=(
+                self.request.POST
+                if self.request.method == "POST"
+                and self.request.POST.get("room_mode") == "change"
+                else None
+            ),
         )
 
     @cached_property
@@ -237,10 +244,12 @@ class OrderRoomChange(EventViewMixin, OrderDetailMixin, TemplateView):
         return RoomCreateForm(
             event=self.request.event,
             prefix="create",
-            data=self.request.POST
-            if self.request.method == "POST"
-            and self.request.POST.get("room_mode") == "create"
-            else None,
+            data=(
+                self.request.POST
+                if self.request.method == "POST"
+                and self.request.POST.get("room_mode") == "create"
+                else None
+            ),
         )
 
     @cached_property
@@ -248,10 +257,12 @@ class OrderRoomChange(EventViewMixin, OrderDetailMixin, TemplateView):
         return RoomJoinForm(
             event=self.request.event,
             prefix="join",
-            data=self.request.POST
-            if self.request.method == "POST"
-            and self.request.POST.get("room_mode") == "join"
-            else None,
+            data=(
+                self.request.POST
+                if self.request.method == "POST"
+                and self.request.POST.get("room_mode") == "join"
+                else None
+            ),
         )
 
     def get_context_data(self, **kwargs):
@@ -424,7 +435,9 @@ class RoomDelete(EventPermissionRequiredMixin, CompatDeleteView):
 
 class StatsMixin:
     def get_ticket_stats(self, event):
-        qs = OrderPosition.objects.filter(order__event=event,).annotate(
+        qs = OrderPosition.objects.filter(
+            order__event=event,
+        ).annotate(
             has_room=Exists(OrderRoom.objects.filter(order_id=OuterRef("order_id")))
         )
         return [
