@@ -183,7 +183,7 @@ def shipping_logentry_display(sender, logentry, **kwargs):
 def control_nav_event(sender, request=None, **kwargs):
     url = resolve(request.path_info)
     if not request.user.has_event_permission(
-        request.organizer, request.event, "can_view_orders", request=request
+        request.organizer, request.event, "can_change_orders", request=request
     ):
         return []
     return [
