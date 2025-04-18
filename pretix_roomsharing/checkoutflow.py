@@ -273,14 +273,6 @@ class RoomStep(CartMixin, TemplateFlowStep):
                 room = Room.objects.get(
                     event=self.event, pk=cart_session(request)["room_join"]
                 )
-                room_subevents = set(
-                    c["order__all_positions__subevent"]
-                    for c in room.orderrooms.filter(
-                        order__all_positions__canceled=False
-                    )
-                    .values("order__all_positions__subevent")
-                    .distinct()
-                )
                 # Validation of max people
                 if self.request.event.settings.roomsharing__check_max_people:
                     max_people = None
@@ -339,6 +331,14 @@ class RoomStep(CartMixin, TemplateFlowStep):
                             )
                         return False
 
+                room_subevents = set(
+                    c["order__all_positions__subevent"]
+                    for c in room.orderrooms.filter(
+                        order__all_positions__canceled=False
+                    )
+                    .values("order__all_positions__subevent")
+                    .distinct()
+                )
                 if room_subevents:
                     cart_subevents = set(
                         c["subevent"]

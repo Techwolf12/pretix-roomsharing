@@ -113,6 +113,7 @@ class RoomChangePasswordForm(forms.Form):
         label=_("New room password"),
         help_text=_("Optional"),
         min_length=3,
+        widget=forms.PasswordInput,
         required=False,
     )
 
@@ -280,11 +281,6 @@ class OrderRoomChange(EventViewMixin, OrderDetailMixin, TemplateView):
             ctx["selected"] = self.request.POST.get("room_mode", "none")
 
         return ctx
-
-    def dispatch(self, request, *args, **kwargs):
-        self.request = request
-
-        return super().dispatch(request, *args, **kwargs)
 
 
 class ControlRoomForm(forms.ModelForm):
