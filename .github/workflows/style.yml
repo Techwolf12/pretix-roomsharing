@@ -21,7 +21,7 @@ jobs:
       - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: 3.15
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pip
@@ -42,7 +42,7 @@ jobs:
       - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: 3.15
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pip
@@ -64,7 +64,7 @@ jobs:
       - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: 3.15
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pip
@@ -86,7 +86,7 @@ jobs:
       - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: 3.15
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pip
@@ -108,7 +108,7 @@ jobs:
       - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: 3.15
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pip
