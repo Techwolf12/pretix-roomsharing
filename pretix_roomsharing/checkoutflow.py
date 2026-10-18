@@ -10,6 +10,7 @@ from pretix.presale.views import CartMixin, get_cart
 from pretix.presale.views.cart import cart_session
 
 from .models import Room
+from .utils import requires_room
 
 
 class RoomCreateForm(forms.Form):
@@ -252,15 +253,9 @@ class RoomStep(CartMixin, TemplateFlowStep):
         ctx["join_form"] = self.join_form
         ctx["cart"] = self.get_cart()
         ctx["selected"] = self.cart_session.get("room_mode", "")
-        order_has_room = False
-        for cartPosition in self.get_cart()["positions"]:
-            if (
-                str(cartPosition.item.id)
-                in self.request.event.settings.roomsharing__products
-            ):
-                order_has_room = True
-
-        ctx["order_has_room"] = order_has_room
+        ctx["order_has_room"] = requires_room(
+            self.request.event, (p.item for p in ctx["cart"]["positions"])
+        )
         return ctx
 
     def is_completed(self, request, warn=False):

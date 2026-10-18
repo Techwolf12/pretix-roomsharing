@@ -25,6 +25,7 @@ from pretix.presale.views.cart import cart_session
 
 from .checkoutflow import RoomStep
 from .models import OrderRoom, Room
+from .utils import requires_room
 
 logger = logging.getLogger(__name__)
 
@@ -114,11 +115,9 @@ def order_info(sender: Event, order: Order, **kwargs):
     }
 
     # Show link for user to change room
-    order_has_room = False
-    for orderPosition in order.positions.all():
-        if str(orderPosition.item.id) in sender.settings.roomsharing__products:
-            order_has_room = True
-    ctx["order_has_room"] = order_has_room
+    ctx["order_has_room"] = requires_room(
+        sender, (p.item for p in order.positions.select_related("item"))
+    )
 
     # Show current room details
     try:
@@ -234,4 +233,4 @@ try:
 except ImportError:
     pass
 
-settings_hierarkey.add_default("roomsharing__products", None, list)
+settings_hierarkey.add_default("roomsharing__products", [], list)
