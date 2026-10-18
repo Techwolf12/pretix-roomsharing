@@ -53,8 +53,9 @@
             {% bootstrap_field form.allow_random_room layout="control" %}
         </fieldset>
         <fieldset>
-            <legend>{% trans "Room members" %}</legend>
+            <legend>{% trans "Shown to attendees" %}</legend>
             {% bootstrap_field form.member_fields layout="control" %}
+            {% bootstrap_field form.show_room_number layout="control" %}
         </fieldset>
         <div class="form-group submit-group">
             <button type="submit" class="btn btn-primary btn-save">

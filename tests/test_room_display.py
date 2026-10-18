@@ -133,3 +133,46 @@ def test_order_info_without_capacity(event, room, hotel):
     room.save()
     order = room.orderrooms.get().order
     assert "places in this room are taken" not in order_info(event, order=order)
+
+
+def test_room_form_saves_room_number(event, room):
+    data = {**_form_data(room, ""), "room_number": "A-101"}
+    form = RoomForm(event=event, instance=room, data=data)
+    assert form.is_valid(), form.errors
+    form.save()
+    room.refresh_from_db()
+    assert room.room_number == "A-101"
+
+
+@pytest.mark.django_db
+def test_room_number_in_backend(staff_client, room):
+    room.room_number = "A-101"
+    room.save()
+    order = room.orderrooms.get().order
+    assert (
+        "A-101"
+        in staff_client.get("/control/event/dummy/dummy/rooms/").content.decode()
+    )
+    r = staff_client.get(f"/control/event/dummy/dummy/orders/{order.code}/")
+    assert "A-101" in r.content.decode()
+
+
+def test_room_number_hidden_from_attendees_by_default(event, room):
+    room.room_number = "A-101"
+    room.save()
+    order = room.orderrooms.get().order
+    assert "A-101" not in order_info(event, order=order)
+
+    event.settings.roomsharing__show_room_number = True
+    assert "Your room number is <strong>A-101</strong>." in order_info(
+        event, order=order
+    )
+
+
+def test_settings_form_saves_show_room_number(event):
+    from pretix_roomsharing.views import RoomsharingSettingsForm
+
+    form = RoomsharingSettingsForm(event=event, data={"show_room_number": "on"})
+    assert form.is_valid(), form.errors
+    form.save()
+    assert event.settings.roomsharing__show_room_number is True

@@ -1,5 +1,7 @@
 from django.urls import path, re_path
+from pretix.api.urls import event_router
 
+from .api import RoomViewSet
 from .views import (
     ControlRoomChange,
     MetricsView,
@@ -56,3 +58,5 @@ event_patterns = [
         name="event.order.room.modify",
     ),
 ]
+
+event_router.register("rooms", RoomViewSet, basename="rooms")

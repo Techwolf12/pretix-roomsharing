@@ -24,6 +24,10 @@
                         {{ room.name }}
                     </a>
                 </dd>
+                {% if room.room_number %}
+                    <dt>{% trans "Room number" %}</dt>
+                    <dd>{{ room.room_number }}</dd>
+                {% endif %}
                 <dt>{% trans "Administrator" %}</dt>
                 <dd>{% if is_admin %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}</dd>
             </dl>

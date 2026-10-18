@@ -35,6 +35,13 @@ class Room(LoggedModel):
     )
     name = models.CharField(max_length=190)
     password = models.CharField(max_length=190, blank=True)
+    room_number = models.CharField(
+        max_length=190,
+        blank=True,
+        default="",
+        verbose_name=_("Room number"),
+        help_text=_("For example the hotel room number. Set by staff."),
+    )
     created = models.DateTimeField(auto_now_add=True)
     # The room type, taken from the ticket of the person who created the room.
     item = models.ForeignKey(

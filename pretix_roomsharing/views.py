@@ -62,6 +62,14 @@ class RoomsharingSettingsForm(forms.Form):
         ),
         required=False,
     )
+    show_room_number = forms.BooleanField(
+        label=_("Show the room number to attendees"),
+        help_text=_(
+            "If enabled, attendees see the room number staff entered for their room "
+            "on their order page."
+        ),
+        required=False,
+    )
     member_fields = forms.MultipleChoiceField(
         label=_("Details shown about room members"),
         help_text=_(
@@ -81,6 +89,9 @@ class RoomsharingSettingsForm(forms.Form):
         )
         self.fields["allow_random_room"].initial = (
             self.event.settings.roomsharing__allow_random_room
+        )
+        self.fields["show_room_number"].initial = (
+            self.event.settings.roomsharing__show_room_number
         )
         self.fields["member_fields"].choices = member_field_choices(self.event)
         self.fields["member_fields"].initial = (
@@ -129,6 +140,9 @@ class RoomsharingSettingsForm(forms.Form):
         ]
         self.event.settings.roomsharing__member_fields = self.cleaned_data[
             "member_fields"
+        ]
+        self.event.settings.roomsharing__show_room_number = self.cleaned_data[
+            "show_room_number"
         ]
 
 
@@ -430,7 +444,7 @@ class RoomForm(forms.ModelForm):
 
     class Meta:
         model = Room
-        fields = ["name", "password"]
+        fields = ["name", "password", "room_number"]
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop("event")

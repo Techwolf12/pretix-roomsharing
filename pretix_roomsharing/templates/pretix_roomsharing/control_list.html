@@ -20,6 +20,7 @@
                 <thead>
                 <tr>
                     <th>{% trans "Room name" %}</th>
+                    <th>{% trans "Room number" %}</th>
                     <th>{% trans "Room type" %}</th>
                     <th>{% trans "People" %}</th>
                     <th></th>
@@ -35,6 +36,7 @@
                                 </a>
                             </strong>
                         </td>
+                        <td>{{ c.room_number }}</td>
                         <td>
                             {% if c.item %}
                                 {{ c.item }}{% if c.variation %} – {{ c.variation }}{% endif %}

@@ -16,10 +16,49 @@ Features
 * Decide whether attendees may be assigned a random room, or must create or join one
 * Choose what roommates see about each other: order code, attendee name and/or answers to your own questions
 * Manage rooms in the backend: see who is in which room and how full it is, move orders between rooms, and change or delete rooms
+* Give rooms a room number (e.g. the hotel room), visible to staff and optionally to attendees
 * Room statistics per product and date, with a metrics endpoint for monitoring
+* REST API and ticket placeholders with each attendee's room, e.g. for check-in apps or badges
 * Respects your order modification deadline, and works with event series
 
 Requires pretix 2026.3 or newer.
+
+
+API
+---
+
+All endpoints need an API token or user with the ``event.orders:read`` permission.
+
+``GET /api/v1/organizers/{organizer}/events/{event}/rooms/``
+    Lists the event's rooms, paginated like pretix's other endpoints. ``GET .../rooms/{id}/`` returns a single room.
+    Filter with ``?order={order code}``, ``?room_number=`` or ``?name=``. Each room looks like this::
+
+        {
+            "id": 1,
+            "name": "Room 1",
+            "room_number": "101",
+            "item": 12,
+            "variation": 34,
+            "capacity": 4,
+            "occupancy": 2,
+            "members": [
+                {"order": "ABC12", "position": 56, "positionid": 1,
+                 "attendee_name": "Alex Example", "is_admin": true}
+            ]
+        }
+
+    ``item`` and ``variation`` are the room type, ``capacity`` is ``null`` for rooms without a maximum, and
+    ``members`` lists the room tickets of pending and paid orders. Room passwords are never included.
+
+Order and order position API (``plugin_data``)
+    pretix's own order and order position endpoints include the order's room, or ``null``::
+
+        "plugin_data": {"roomsharing": {"room": {"id": 1, "name": "Room 1", "room_number": "101"}}}
+
+Check-in API and ticket layouts
+    pretix's check-in endpoints don't include ``plugin_data``. Instead, the plugin adds the ticket placeholders
+    ``roomsharing_room_name`` and ``roomsharing_room_number``, which appear in the check-in API's ``pdf_data`` when you
+    pass ``?pdf_data=true`` (for example when redeeming a ticket). You can also print them on tickets and badges.
 
 
 Development setup

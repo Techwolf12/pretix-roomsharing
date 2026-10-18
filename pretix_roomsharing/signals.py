@@ -7,6 +7,7 @@ from django.http import HttpRequest
 from django.template.loader import get_template
 from django.urls import resolve, reverse
 from django.utils.translation import gettext_lazy as _
+from pretix.api.signals import order_api_details, orderposition_api_details
 from pretix.base.logentrytypes import (
     EventLogEntryType,
     OrderLogEntryType,
@@ -14,7 +15,7 @@ from pretix.base.logentrytypes import (
 )
 from pretix.base.models import Event, Order
 from pretix.base.settings import settings_hierarkey
-from pretix.base.signals import event_copy_data, order_placed
+from pretix.base.signals import event_copy_data, layout_text_variables, order_placed
 from pretix.control.forms.filter import FilterForm
 from pretix.control.signals import (
     nav_event,
@@ -29,6 +30,7 @@ from pretix.presale.signals import (
 )
 from pretix.presale.views.cart import cart_session
 
+from .api import order_room_data
 from .checkoutflow import RoomStep
 from .models import OrderRoom, Room
 from .utils import (
@@ -155,6 +157,7 @@ def order_info(sender: Event, order: Order, **kwargs):
         fields = sender.settings.roomsharing__member_fields
         ctx["room"] = c.room
         ctx["is_admin"] = c.is_admin
+        ctx["show_room_number"] = sender.settings.roomsharing__show_room_number
         ctx["fellows"] = [
             " – ".join(member_details(p, fields)) or _("Room member")
             for p in room_members(c.room, exclude_order=order)
@@ -288,6 +291,42 @@ except ImportError:
     pass
 
 
+def _order_room(order):
+    try:
+        return order.orderroom.room
+    except OrderRoom.DoesNotExist:
+        return None
+
+
+@receiver(layout_text_variables, dispatch_uid="room_layout_text_variables")
+def room_layout_text_variables(sender, **kwargs):
+    # Usable on tickets and badges, and included in the check-in API's pdf_data.
+    return {
+        "roomsharing_room_name": {
+            "label": _("Room name (Roomsharing)"),
+            "editor_sample": _("Room 1"),
+            "evaluate": lambda op, order, ev: getattr(_order_room(order), "name", ""),
+        },
+        "roomsharing_room_number": {
+            "label": _("Room number (Roomsharing)"),
+            "editor_sample": "101",
+            "evaluate": lambda op, order, ev: getattr(
+                _order_room(order), "room_number", ""
+            ),
+        },
+    }
+
+
+@receiver(order_api_details, dispatch_uid="room_order_api_details")
+def order_api_room(sender, order, **kwargs):
+    return {"roomsharing": {"room": order_room_data(order)}}
+
+
+@receiver(orderposition_api_details, dispatch_uid="room_orderposition_api_details")
+def orderposition_api_room(sender, orderposition, **kwargs):
+    return {"roomsharing": {"room": order_room_data(orderposition.order)}}
+
+
 @receiver(event_copy_data, dispatch_uid="room_copy_data")
 def copy_room_products(sender, other, item_map, variation_map, **kwargs):
     for rp in other.room_products.all():
@@ -301,3 +340,4 @@ def copy_room_products(sender, other, item_map, variation_map, **kwargs):
 settings_hierarkey.add_default("roomsharing__same_product_only", "False", bool)
 settings_hierarkey.add_default("roomsharing__allow_random_room", "True", bool)
 settings_hierarkey.add_default("roomsharing__member_fields", ["code"], list)
+settings_hierarkey.add_default("roomsharing__show_room_number", "False", bool)
