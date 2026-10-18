@@ -262,7 +262,7 @@ class ControlRoomForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop("event")
         super().__init__(*args, **kwargs)
-        self.fields["room"].queryset = self.event.room.all()
+        self.fields["room"].queryset = self.event.rooms.all()
 
 
 class ControlRoomChange(OrderView):
