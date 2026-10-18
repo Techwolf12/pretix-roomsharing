@@ -11,6 +11,8 @@ except ImportError:
 class PluginApp(PluginConfig):
     name = "pretix_roomsharing"
     verbose_name = "Roomsharing"
+    # Keep integer primary keys; pretix's BigAutoField default would rewrite existing tables.
+    default_auto_field = "django.db.models.AutoField"
 
     class PretixPluginMeta:
         name = gettext_lazy("Roomsharing")
