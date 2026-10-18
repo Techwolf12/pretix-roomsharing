@@ -33,6 +33,7 @@ from .models import OrderRoom, Room, RoomProduct
 from .utils import (
     can_change_room,
     member_field_choices,
+    random_room_error,
     room_capacity,
     room_occupancy,
     room_products,
@@ -52,6 +53,15 @@ class RoomsharingSettingsForm(forms.Form):
         ),
         required=False,
     )
+    allow_random_room = forms.BooleanField(
+        label=_("Allow attendees to be assigned a random room"),
+        help_text=_(
+            "If disabled, attendees with a room ticket must create or join a room. "
+            "With the same ticket option enabled, orders that mix ticket types "
+            "then can't be completed until the cart is changed."
+        ),
+        required=False,
+    )
     member_fields = forms.MultipleChoiceField(
         label=_("Details shown about room members"),
         help_text=_(
@@ -68,6 +78,9 @@ class RoomsharingSettingsForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields["same_product_only"].initial = (
             self.event.settings.roomsharing__same_product_only
+        )
+        self.fields["allow_random_room"].initial = (
+            self.event.settings.roomsharing__allow_random_room
         )
         self.fields["member_fields"].choices = member_field_choices(self.event)
         self.fields["member_fields"].initial = (
@@ -110,6 +123,9 @@ class RoomsharingSettingsForm(forms.Form):
                 existing[lookup].delete()
         self.event.settings.roomsharing__same_product_only = self.cleaned_data[
             "same_product_only"
+        ]
+        self.event.settings.roomsharing__allow_random_room = self.cleaned_data[
+            "allow_random_room"
         ]
         self.event.settings.roomsharing__member_fields = self.cleaned_data[
             "member_fields"
@@ -261,8 +277,12 @@ class OrderRoomChange(EventViewMixin, OrderDetailMixin, TemplateView):
                 messages.success(request, _("Great, we saved your changes!"))
                 return redirect(self.get_order_url())
         elif mode == "none":
-            messages.success(request, _("Great, we saved your changes!"))
-            return redirect(self.get_order_url())
+            error = random_room_error(self.request.event, self.order.positions.all())
+            if not error:
+                messages.success(request, _("Great, we saved your changes!"))
+                return redirect(self.get_order_url())
+            messages.error(request, error)
+            return self.get(request, *args, **kwargs)
 
         messages.error(
             self.request,
@@ -325,6 +345,9 @@ class OrderRoomChange(EventViewMixin, OrderDetailMixin, TemplateView):
             ctx["is_admin"] = c.is_admin
         except OrderRoom.DoesNotExist:
             ctx["selected"] = self.request.POST.get("room_mode", "none")
+        ctx["allow_random_room"] = (
+            self.request.event.settings.roomsharing__allow_random_room
+        )
 
         return ctx
 

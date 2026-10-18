@@ -299,4 +299,5 @@ def copy_room_products(sender, other, item_map, variation_map, **kwargs):
 
 
 settings_hierarkey.add_default("roomsharing__same_product_only", "False", bool)
+settings_hierarkey.add_default("roomsharing__allow_random_room", "True", bool)
 settings_hierarkey.add_default("roomsharing__member_fields", ["code"], list)

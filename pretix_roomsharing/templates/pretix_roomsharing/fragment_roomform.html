@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load bootstrap3 %}
 <div class="panel-group" id="room_accordion">
+    {% if allow_random_room %}
     <div class="panel panel-default">
         <label class="accordion-radio">
             <div class="panel-heading">
@@ -20,6 +21,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
     <div class="panel panel-default">
         <label class="accordion-radio">
             <div class="panel-heading">

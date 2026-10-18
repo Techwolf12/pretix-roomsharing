@@ -104,6 +104,14 @@ def join_error(room, positions, exclude_order=None):
             return _("This room is full. Please choose a different room.")
 
 
+def random_room_error(event, positions):
+    """Return why these positions can't ask for a random room, or ``None``."""
+    if event.settings.roomsharing__allow_random_room:
+        return None
+    if requires_room(event, positions):
+        return _("Please create a new room or join an existing one.")
+
+
 def member_field_choices(event) -> list:
     """Return the fields staff can choose to show for room members."""
     choices = [("code", _("Order code")), ("attendee_name", _("Attendee name"))]

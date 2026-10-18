@@ -48,8 +48,9 @@
             </div>
         </fieldset>
         <fieldset>
-            <legend>{% trans "Room types" %}</legend>
+            <legend>{% trans "Room choice" %}</legend>
             {% bootstrap_field form.same_product_only layout="control" %}
+            {% bootstrap_field form.allow_random_room layout="control" %}
         </fieldset>
         <fieldset>
             <legend>{% trans "Room members" %}</legend>

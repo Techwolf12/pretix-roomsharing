@@ -10,7 +10,7 @@ from pretix.presale.views import CartMixin, get_cart
 from pretix.presale.views.cart import cart_session
 
 from .models import Room
-from .utils import create_error, join_error, requires_room, room_type
+from .utils import create_error, join_error, random_room_error, requires_room, room_type
 
 
 class RoomCreateForm(forms.Form):
@@ -190,7 +190,11 @@ class RoomStep(CartMixin, TemplateFlowStep):
                 self.cart_session["room_create"] = room.pk
                 return redirect(self.get_next_url(request))
         elif self.cart_session["room_mode"] == "none":
-            return redirect(self.get_next_url(request))
+            error = random_room_error(self.event, self.positions)
+            if not error:
+                return redirect(self.get_next_url(request))
+            messages.error(self.request, error)
+            return self.render()
 
         messages.error(
             self.request,
@@ -275,6 +279,9 @@ class RoomStep(CartMixin, TemplateFlowStep):
         ctx["cart"] = self.get_cart()
         ctx["selected"] = self.cart_session.get("room_mode", "")
         ctx["order_has_room"] = requires_room(self.request.event, self.positions)
+        ctx["allow_random_room"] = (
+            self.request.event.settings.roomsharing__allow_random_room
+        )
         return ctx
 
     def is_completed(self, request, warn=False):
@@ -342,6 +349,8 @@ class RoomStep(CartMixin, TemplateFlowStep):
                 return join_error(room, positions)
             if session.get("room_mode") == "create" and "room_create" in session:
                 return create_error(request.event, positions)
+            if session.get("room_mode") == "none":
+                return random_room_error(request.event, positions)
         except Room.DoesNotExist:
             pass
 
