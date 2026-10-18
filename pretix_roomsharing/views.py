@@ -50,7 +50,7 @@ class RoomsharingSettingsForm(SettingsForm):
         )
 
         self.fields["roomsharing__products"].choices = choices
-        #self.initial["roomsharing__products"] = event.settings.roomsharing__products
+        # self.initial["roomsharing__products"] = event.settings.roomsharing__products
 
 
 class SettingsView(EventSettingsViewMixin, EventSettingsFormView):
@@ -198,10 +198,12 @@ class OrderRoomChange(EventViewMixin, OrderDetailMixin, TemplateView):
         return RoomChangePasswordForm(
             event=self.request.event,
             prefix="change",
-            data=self.request.POST
-            if self.request.method == "POST"
-            and self.request.POST.get("room_mode") == "change"
-            else None,
+            data=(
+                self.request.POST
+                if self.request.method == "POST"
+                and self.request.POST.get("room_mode") == "change"
+                else None
+            ),
         )
 
     @cached_property
@@ -209,10 +211,12 @@ class OrderRoomChange(EventViewMixin, OrderDetailMixin, TemplateView):
         return RoomCreateForm(
             event=self.request.event,
             prefix="create",
-            data=self.request.POST
-            if self.request.method == "POST"
-            and self.request.POST.get("room_mode") == "create"
-            else None,
+            data=(
+                self.request.POST
+                if self.request.method == "POST"
+                and self.request.POST.get("room_mode") == "create"
+                else None
+            ),
         )
 
     @cached_property
@@ -220,10 +224,12 @@ class OrderRoomChange(EventViewMixin, OrderDetailMixin, TemplateView):
         return RoomJoinForm(
             event=self.request.event,
             prefix="join",
-            data=self.request.POST
-            if self.request.method == "POST"
-            and self.request.POST.get("room_mode") == "join"
-            else None,
+            data=(
+                self.request.POST
+                if self.request.method == "POST"
+                and self.request.POST.get("room_mode") == "join"
+                else None
+            ),
         )
 
     def get_context_data(self, **kwargs):
@@ -396,7 +402,9 @@ class RoomDelete(EventPermissionRequiredMixin, CompatDeleteView):
 
 class StatsMixin:
     def get_ticket_stats(self, event):
-        qs = OrderPosition.objects.filter(order__event=event,).annotate(
+        qs = OrderPosition.objects.filter(
+            order__event=event,
+        ).annotate(
             has_room=Exists(OrderRoom.objects.filter(order_id=OuterRef("order_id")))
         )
         return [

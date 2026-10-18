@@ -29,9 +29,9 @@ class RoomCreateForm(forms.Form):
     password = forms.CharField(
         max_length=190,
         label=_("Room password"),
-        min_length=3, 
+        min_length=3,
         widget=forms.PasswordInput,
-        required=False
+        required=False,
     )
 
     def __init__(self, *args, **kwargs):
@@ -205,10 +205,12 @@ class RoomStep(CartMixin, TemplateFlowStep):
             prefix="create",
             initial=initial,
             current=current,
-            data=self.request.POST
-            if self.request.method == "POST"
-            and self.request.POST.get("room_mode") == "create"
-            else None,
+            data=(
+                self.request.POST
+                if self.request.method == "POST"
+                and self.request.POST.get("room_mode") == "create"
+                else None
+            ),
         )
 
     @cached_property
@@ -232,10 +234,12 @@ class RoomStep(CartMixin, TemplateFlowStep):
             event=self.event,
             prefix="join",
             initial=initial,
-            data=self.request.POST
-            if self.request.method == "POST"
-            and self.request.POST.get("room_mode") == "join"
-            else None,
+            data=(
+                self.request.POST
+                if self.request.method == "POST"
+                and self.request.POST.get("room_mode") == "join"
+                else None
+            ),
         )
 
     @cached_property
@@ -289,11 +293,9 @@ class RoomStep(CartMixin, TemplateFlowStep):
                             messages.warning(
                                 request,
                                 _(
-                                    """
-                                    You requested to join a room that participates in "{subevent_room}",
-                                    while you chose to participate in "{subevent_cart}".
-                                    Please choose a different room.
-                                """
+                                    'You requested to join a room that participates in "{subevent_room}", '
+                                    'while you chose to participate in "{subevent_cart}". '
+                                    "Please choose a different room."
                                 ).format(
                                     subevent_room=SubEvent.objects.get(
                                         pk=list(room_subevents)[0]
