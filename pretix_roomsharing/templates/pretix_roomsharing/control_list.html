@@ -20,11 +20,13 @@
                 <thead>
                 <tr>
                     <th>{% trans "Room name" %}</th>
+                    <th>{% trans "Room type" %}</th>
+                    <th>{% trans "People" %}</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for c in rooms %}
+                {% for c, occupancy, capacity in room_rows %}
                     <tr>
                         <td>
                             <strong>
@@ -33,6 +35,14 @@
                                 </a>
                             </strong>
                         </td>
+                        <td>
+                            {% if c.item %}
+                                {{ c.item }}{% if c.variation %} – {{ c.variation }}{% endif %}
+                            {% else %}
+                                <em>{% trans "None" %}</em>
+                            {% endif %}
+                        </td>
+                        <td>{% if capacity %}{{ occupancy }} / {{ capacity }}{% else %}{{ occupancy }}{% endif %}</td>
                         <td class="text-right">
                             <a href="{% url "plugins:pretix_roomsharing:event.room.detail" event=request.event.slug organizer=request.event.organizer.slug pk=c.pk %}" class="btn btn-default">
                                 <span class="fa fa-edit"></span>

@@ -31,7 +31,14 @@ from pretix.presale.views.cart import cart_session
 
 from .checkoutflow import RoomStep
 from .models import OrderRoom, Room
-from .utils import can_change_room, join_error, requires_room, room_type
+from .utils import (
+    can_change_room,
+    join_error,
+    requires_room,
+    room_capacity,
+    room_occupancy,
+    room_type,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -152,6 +159,8 @@ def order_info(sender: Event, order: Order, **kwargs):
         ctx["room"] = c.room
         ctx["is_admin"] = c.is_admin
         ctx["fellows"] = fellows_orders
+        ctx["occupancy"] = room_occupancy(c.room)
+        ctx["capacity"] = room_capacity(c.room)
     except OrderRoom.DoesNotExist:
         pass
 

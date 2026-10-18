@@ -30,7 +30,14 @@ from pretix.presale.views.order import OrderDetailMixin
 
 from .checkoutflow import RoomCreateForm, RoomJoinForm
 from .models import OrderRoom, Room, RoomProduct
-from .utils import can_change_room, room_products, room_type
+from .utils import (
+    can_change_room,
+    room_capacity,
+    room_occupancy,
+    room_products,
+    room_type,
+    room_type_label,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -355,10 +362,31 @@ class RoomList(EventPermissionRequiredMixin, ListView):
     paginate_by = 25
 
     def get_queryset(self):
-        return self.request.event.rooms.all()
+        return self.request.event.rooms.select_related("item", "variation")
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["room_rows"] = [
+            (room, room_occupancy(room), room_capacity(room)) for room in ctx["rooms"]
+        ]
+        return ctx
+
+
+def _room_type_key(item_id, variation_id):
+    return f"{item_id}_{variation_id or ''}"
 
 
 class RoomForm(forms.ModelForm):
+    room_type = forms.ChoiceField(
+        label=_("Room type"),
+        required=False,
+        help_text=_(
+            "Determines the maximum number of people in this room and, if enabled, "
+            "which ticket people need to join it. Staff changes are not checked "
+            "against these limits."
+        ),
+    )
+
     class Meta:
         model = Room
         fields = ["name", "password"]
@@ -366,6 +394,23 @@ class RoomForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop("event")
         super().__init__(*args, **kwargs)
+        choices = [("", _("No room type"))] + [
+            (_room_type_key(rp.item_id, rp.variation_id), str(rp))
+            for rp in self.event.room_products.select_related("item", "variation")
+        ]
+        if self.instance.item_id:
+            current = _room_type_key(self.instance.item_id, self.instance.variation_id)
+            if current not in dict(choices):
+                # Keep a type that is no longer a room product selectable.
+                choices.append((current, room_type_label(self.instance)))
+            self.fields["room_type"].initial = current
+        self.fields["room_type"].choices = choices
+
+    def save(self, commit=True):
+        item_id, _sep, variation_id = self.cleaned_data["room_type"].partition("_")
+        self.instance.item_id = int(item_id) if item_id else None
+        self.instance.variation_id = int(variation_id) if variation_id else None
+        return super().save(commit=commit)
 
     def clean_name(self):
         name = self.cleaned_data.get("name")
@@ -408,6 +453,8 @@ class RoomDetail(EventPermissionRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["orders"] = self.object.orderrooms.select_related("order")
+        ctx["occupancy"] = room_occupancy(self.object)
+        ctx["capacity"] = room_capacity(self.object)
         return ctx
 
 
