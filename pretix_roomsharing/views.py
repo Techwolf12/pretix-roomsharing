@@ -30,7 +30,7 @@ from pretix.presale.views.order import OrderDetailMixin
 
 from .checkoutflow import RoomCreateForm, RoomJoinForm
 from .models import OrderRoom, Room, RoomProduct
-from .utils import can_change_room, room_products
+from .utils import can_change_room, room_products, room_type
 
 logger = logging.getLogger(__name__)
 
@@ -225,6 +225,9 @@ class OrderRoomChange(EventViewMixin, OrderDetailMixin, TemplateView):
                 room = Room(event=self.request.event)
                 room.name = self.create_form.cleaned_data["name"]
                 room.password = self.create_form.cleaned_data["password"]
+                room.item, room.variation = room_type(
+                    self.request.event, self.order.positions.all()
+                )
                 room.save()
                 OrderRoom.objects.create(room=room, order=self.order, is_admin=True)
                 self.order.log_action(
@@ -260,6 +263,7 @@ class OrderRoomChange(EventViewMixin, OrderDetailMixin, TemplateView):
         return RoomCreateForm(
             event=self.request.event,
             prefix="create",
+            positions=self.order.positions.all(),
             data=(
                 self.request.POST
                 if self.request.method == "POST"
@@ -273,6 +277,8 @@ class OrderRoomChange(EventViewMixin, OrderDetailMixin, TemplateView):
         return RoomJoinForm(
             event=self.request.event,
             prefix="join",
+            positions=self.order.positions.all(),
+            exclude_order=self.order,
             data=(
                 self.request.POST
                 if self.request.method == "POST"

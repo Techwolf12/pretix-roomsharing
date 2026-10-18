@@ -10,7 +10,7 @@ from pretix.presale.views import CartMixin, get_cart
 from pretix.presale.views.cart import cart_session
 
 from .models import Room
-from .utils import requires_room
+from .utils import create_error, join_error, requires_room, room_type
 
 
 class RoomCreateForm(forms.Form):
@@ -38,6 +38,7 @@ class RoomCreateForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop("event")
         self.room = kwargs.pop("current", None)
+        self.positions = kwargs.pop("positions", [])
         super().__init__(*args, **kwargs)
 
     def clean_name(self):
@@ -67,6 +68,13 @@ class RoomCreateForm(forms.Form):
 
         return password
 
+    def clean(self):
+        cleaned_data = super().clean()
+        error = create_error(self.event, self.positions)
+        if error:
+            raise forms.ValidationError({"name": error}, code="not_allowed")
+        return cleaned_data
+
 
 class RoomJoinForm(forms.Form):
     error_messages = {
@@ -94,6 +102,8 @@ class RoomJoinForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop("event")
+        self.positions = kwargs.pop("positions", [])
+        self.exclude_order = kwargs.pop("exclude_order", None)
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -134,6 +144,10 @@ class RoomJoinForm(forms.Form):
                     code="pw_mismatch",
                 )
 
+        error = join_error(room, self.positions, exclude_order=self.exclude_order)
+        if error:
+            raise forms.ValidationError({"name": error}, code="not_allowed")
+
         self.cleaned_data["room"] = room
         return self.cleaned_data
 
@@ -171,6 +185,7 @@ class RoomStep(CartMixin, TemplateFlowStep):
 
                 room.name = self.create_form.cleaned_data["name"]
                 room.password = self.create_form.cleaned_data["password"]
+                room.item, room.variation = room_type(self.event, self.positions)
                 room.save()
                 self.cart_session["room_create"] = room.pk
                 return redirect(self.get_next_url(request))
@@ -206,6 +221,7 @@ class RoomStep(CartMixin, TemplateFlowStep):
             prefix="create",
             initial=initial,
             current=current,
+            positions=self.positions,
             data=(
                 self.request.POST
                 if self.request.method == "POST"
@@ -235,6 +251,7 @@ class RoomStep(CartMixin, TemplateFlowStep):
             event=self.event,
             prefix="join",
             initial=initial,
+            positions=self.positions,
             data=(
                 self.request.POST
                 if self.request.method == "POST"
@@ -247,18 +264,28 @@ class RoomStep(CartMixin, TemplateFlowStep):
     def cart_session(self):
         return cart_session(self.request)
 
+    @cached_property
+    def positions(self):
+        return list(get_cart(self.request))
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["create_form"] = self.create_form
         ctx["join_form"] = self.join_form
         ctx["cart"] = self.get_cart()
         ctx["selected"] = self.cart_session.get("room_mode", "")
-        ctx["order_has_room"] = requires_room(
-            self.request.event, ctx["cart"]["positions"]
-        )
+        ctx["order_has_room"] = requires_room(self.request.event, self.positions)
         return ctx
 
     def is_completed(self, request, warn=False):
+        # Re-check the room rules: the room may have filled up, or the cart may have
+        # changed since the room step.
+        error = self._room_error(request)
+        if error:
+            if warn:
+                messages.warning(request, error)
+            return False
+
         if (
             request.event.has_subevents
             and cart_session(request).get("room_mode") == "join"
@@ -305,6 +332,18 @@ class RoomStep(CartMixin, TemplateFlowStep):
                 pass
 
         return "room_mode" in cart_session(request)
+
+    def _room_error(self, request):
+        session = cart_session(request)
+        positions = list(get_cart(request))
+        try:
+            if session.get("room_mode") == "join" and "room_join" in session:
+                room = Room.objects.get(event=request.event, pk=session["room_join"])
+                return join_error(room, positions)
+            if session.get("room_mode") == "create" and "room_create" in session:
+                return create_error(request.event, positions)
+        except Room.DoesNotExist:
+            pass
 
     def is_applicable(self, request):
         return True

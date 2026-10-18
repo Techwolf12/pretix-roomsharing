@@ -1,6 +1,7 @@
 # Register your receivers here
 import logging
 from django import forms
+from django.db import transaction
 from django.dispatch import receiver
 from django.http import HttpRequest
 from django.template.loader import get_template
@@ -30,7 +31,7 @@ from pretix.presale.views.cart import cart_session
 
 from .checkoutflow import RoomStep
 from .models import OrderRoom, Room
-from .utils import can_change_room, requires_room
+from .utils import can_change_room, join_error, requires_room, room_type
 
 logger = logging.getLogger(__name__)
 
@@ -78,13 +79,28 @@ def placed_order(sender: Event, order: Order, **kwargs):
             logger.error("Room did not exist in room creation, can't add user to room")
             return
         else:
+            # The final order is authoritative for the room type.
+            c.item, c.variation = room_type(sender, order.positions.all())
+            c.save(update_fields=["item", "variation"])
             c.orderrooms.create(order=order, is_admin=True)
     elif order.meta_info_data and order.meta_info_data.get("room_mode") == "join":
-        try:
-            c = sender.rooms.get(pk=order.meta_info_data["room_join"])
-        except Room.DoesNotExist:
-            return
-        else:
+        with transaction.atomic():
+            try:
+                # Lock the room so concurrent checkouts can't both take the last spot.
+                c = sender.rooms.select_for_update().get(
+                    pk=order.meta_info_data["room_join"]
+                )
+            except Room.DoesNotExist:
+                return
+            error = join_error(c, order.positions.all(), exclude_order=order)
+            if error:
+                # The order can't be refused at this point, so leave it without a
+                # room and let staff sort it out.
+                order.log_action(
+                    "pretix_roomsharing.order.join_failed",
+                    data={"room": c.pk, "room_name": c.name, "reason": str(error)},
+                )
+                return
             c.orderrooms.create(order=order, is_admin=False)
 
 
@@ -168,6 +184,9 @@ def control_order_info(sender: Event, request, order: Order, **kwargs):
         "pretix_roomsharing.order.created": _("The user created a new room."),
         "pretix_roomsharing.order.changed": _("The user changed a room password."),
         "pretix_roomsharing.order.deleted": _("The room has been deleted."),
+        "pretix_roomsharing.order.join_failed": _(
+            'The order could not be added to the room "{room_name}": {reason}'
+        ),
     }
 )
 class RoomOrderLogEntryType(OrderLogEntryType):
