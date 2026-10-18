@@ -10,27 +10,29 @@ on:
     paths-ignore:
       - 'pretix_roomsharing/locale/**'
 
+permissions:
+  contents: read
+
 jobs:
   test:
+    name: Tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
-    name: Tests
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.13"]
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
-          python-version: 3.8
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
       - name: Install system dependencies
-        run: sudo apt update && sudo apt install gettext
-      - name: Install pretix
-        run: pip3 install pretix
-      - name: Install Dependencies
-        run: pip3 install pytest pytest-django -Ue .
-      - name: Run checks
-        run: py.test tests
+        run: sudo apt-get update && sudo apt-get install -y gettext
+      - name: Install dependencies
+        run: pip install pretix pytest pytest-django -e .
+      - name: Compile translations
+        run: make
+      - name: Run tests
+        run: python -m pytest tests
