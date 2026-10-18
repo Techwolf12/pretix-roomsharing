@@ -12,7 +12,7 @@ from pretix_roomsharing.utils import can_change_room
 def room_order(event, item, order):
     event.live = True
     event.save()
-    event.settings.roomsharing__products = [str(item.pk)]
+    event.room_products.create(item=item)
     return order
 
 

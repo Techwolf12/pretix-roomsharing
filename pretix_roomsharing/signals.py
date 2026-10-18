@@ -13,7 +13,7 @@ from pretix.base.logentrytypes import (
 )
 from pretix.base.models import Event, Order, OrderPosition
 from pretix.base.settings import settings_hierarkey
-from pretix.base.signals import order_placed
+from pretix.base.signals import event_copy_data, order_placed
 from pretix.control.forms.filter import FilterForm
 from pretix.control.signals import (
     nav_event,
@@ -120,9 +120,9 @@ def order_info(sender: Event, order: Order, **kwargs):
     }
 
     # Show link for user to change room
-    ctx["order_has_room"] = requires_room(
-        sender, (p.item for p in order.positions.select_related("item"))
-    ) and can_change_room(order)
+    ctx["order_has_room"] = requires_room(sender, order.positions.all()) and (
+        can_change_room(order)
+    )
 
     # Show current room details
     try:
@@ -259,4 +259,15 @@ try:
 except ImportError:
     pass
 
-settings_hierarkey.add_default("roomsharing__products", [], list)
+
+@receiver(event_copy_data, dispatch_uid="room_copy_data")
+def copy_room_products(sender, other, item_map, variation_map, **kwargs):
+    for rp in other.room_products.all():
+        sender.room_products.create(
+            item=item_map[rp.item_id],
+            variation=variation_map[rp.variation_id] if rp.variation_id else None,
+            max_people=rp.max_people,
+        )
+
+
+settings_hierarkey.add_default("roomsharing__same_product_only", "False", bool)

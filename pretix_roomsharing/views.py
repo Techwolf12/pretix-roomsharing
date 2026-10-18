@@ -7,7 +7,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Count, Exists, OuterRef
-from django.forms.widgets import CheckboxSelectMultiple
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -16,63 +15,117 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.clickjacking import xframe_options_exempt
-from django.views.generic import ListView, TemplateView
+from django.views.generic import FormView, ListView, TemplateView
 from django_scopes import scopes_disabled
-from pretix.base.forms import SettingsForm
 from pretix.base.models import Event, Order, OrderPosition, OrderRefund
 from pretix.base.views.metrics import unauthed_response
 from pretix.control.permissions import EventPermissionRequiredMixin
 from pretix.control.views import UpdateView
-from pretix.control.views.event import EventSettingsFormView, EventSettingsViewMixin
+from pretix.control.views.event import EventSettingsViewMixin
 from pretix.control.views.orders import OrderView
 from pretix.helpers.compat import CompatDeleteView
 from pretix.multidomain.urlreverse import eventreverse
 from pretix.presale.views import EventViewMixin
 from pretix.presale.views.order import OrderDetailMixin
 
+from .checkoutflow import RoomCreateForm, RoomJoinForm
+from .models import OrderRoom, Room, RoomProduct
+from .utils import can_change_room, room_products
+
 logger = logging.getLogger(__name__)
 
 
-class RoomsharingSettingsForm(SettingsForm):
-    roomsharing__products = forms.MultipleChoiceField(
-        choices=[],
-        label=_("Roomsharing products"),
+class RoomsharingSettingsForm(forms.Form):
+    same_product_only = forms.BooleanField(
+        label=_("Only allow people with the same ticket to share a room"),
+        help_text=_(
+            "If enabled, people can only join a room if all their room tickets have the "
+            "same product and variation as the ticket of the person who created it."
+        ),
         required=False,
-        widget=CheckboxSelectMultiple,
     )
 
     def __init__(self, *args, **kwargs):
-        event = kwargs.get("obj")
+        self.event = kwargs.pop("event")
         super().__init__(*args, **kwargs)
-
-        choices = (
-            (str(i["id"]), i["name"]) for i in event.items.values("name", "id").all()
+        self.fields["same_product_only"].initial = (
+            self.event.settings.roomsharing__same_product_only
         )
+        existing = room_products(self.event)
 
-        self.fields["roomsharing__products"].choices = choices
-        # self.initial["roomsharing__products"] = event.settings.roomsharing__products
+        self.rows = []
+        for item in self.event.items.prefetch_related("variations"):
+            variations = list(item.variations.all()) or [None]
+            for variation in variations:
+                key = f"{item.pk}_{variation.pk}" if variation else str(item.pk)
+                current = existing.get((item.pk, variation.pk if variation else None))
+                self.fields[f"enabled_{key}"] = forms.BooleanField(
+                    required=False, initial=current is not None
+                )
+                self.fields[f"max_{key}"] = forms.IntegerField(
+                    required=False,
+                    min_value=1,
+                    initial=current.max_people if current else None,
+                    widget=forms.NumberInput(attrs={"placeholder": _("Unlimited")}),
+                )
+                self.rows.append((key, item, variation))
+
+    def row_fields(self):
+        for key, item, variation in self.rows:
+            yield item, variation, self[f"enabled_{key}"], self[f"max_{key}"]
+
+    def save(self):
+        existing = room_products(self.event)
+        for key, item, variation in self.rows:
+            lookup = (item.pk, variation.pk if variation else None)
+            if self.cleaned_data[f"enabled_{key}"]:
+                rp = existing.get(lookup) or RoomProduct(
+                    event=self.event, item=item, variation=variation
+                )
+                rp.max_people = self.cleaned_data[f"max_{key}"]
+                rp.save()
+            elif lookup in existing:
+                existing[lookup].delete()
+        self.event.settings.roomsharing__same_product_only = self.cleaned_data[
+            "same_product_only"
+        ]
 
 
-class SettingsView(EventSettingsViewMixin, EventSettingsFormView):
-    model = Event
+class SettingsView(EventSettingsViewMixin, EventPermissionRequiredMixin, FormView):
     form_class = RoomsharingSettingsForm
     template_name = "pretix_roomsharing/settings.html"
     permission = "event.settings.general:write"
-    # TODO: Set user public name field
 
-    def get_success_url(self):
-        return reverse(
-            "plugins:pretix_roomsharing:control.room.settings",
-            kwargs={
-                "organizer": self.request.event.organizer.slug,
-                "event": self.request.event.slug,
-            },
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["event"] = self.request.event
+        return kwargs
+
+    @transaction.atomic
+    def form_valid(self, form):
+        form.save()
+        if form.has_changed():
+            self.request.event.log_action(
+                "pretix.event.settings",
+                user=self.request.user,
+                data={k: form.cleaned_data.get(k) for k in form.changed_data},
+            )
+        messages.success(self.request, _("Your changes have been saved."))
+        return redirect(
+            reverse(
+                "plugins:pretix_roomsharing:control.room.settings",
+                kwargs={
+                    "organizer": self.request.event.organizer.slug,
+                    "event": self.request.event.slug,
+                },
+            )
         )
 
-
-from .checkoutflow import RoomCreateForm, RoomJoinForm
-from .models import OrderRoom, Room
-from .utils import can_change_room
+    def form_invalid(self, form):
+        messages.error(
+            self.request, _("We could not save your changes. See below for details.")
+        )
+        return super().form_invalid(form)
 
 
 class RoomChangePasswordForm(forms.Form):

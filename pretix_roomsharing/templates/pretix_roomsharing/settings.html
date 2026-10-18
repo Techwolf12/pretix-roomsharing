@@ -1,16 +1,55 @@
 {% extends "pretixcontrol/event/settings_base.html" %}
 {% load i18n %}
 {% load bootstrap3 %}
-{% block title %} {% trans "Roomsharing Settings" %} {% endblock %}
+{% block title %}{% trans "Roomsharing Settings" %}{% endblock %}
 {% block inside %}
-  <h1>{% trans "Roomsharing Settings" %}</h1>
-   <p>{% trans "You can setup the roomsharing feature here." %}</p>
-    <form action="" method="post" class="form-horizontal" enctype="multipart/form-data">
+    <h1>{% trans "Roomsharing Settings" %}</h1>
+    <form action="" method="post" class="form-horizontal">
         {% csrf_token %}
+        {% bootstrap_form_errors form %}
         <fieldset>
-            {% bootstrap_form_errors form %}
-            <p>{% trans "Selecting a product here requires room shares to be the same product. You can get around this by using bundled products and selecting one of those here." %}</p>
-            {% bootstrap_field form.roomsharing__products layout="control" %}
+            <legend>{% trans "Room products" %}</legend>
+            <p>
+                {% blocktrans trimmed %}
+                    Attendees who buy one of the selected products or variations can create or join a room.
+                    Leave the maximum empty for rooms without a size limit.
+                {% endblocktrans %}
+            </p>
+            <div class="table-responsive">
+                <table class="table table-condensed table-hover">
+                    <thead>
+                    <tr>
+                        <th>{% trans "Product" %}</th>
+                        <th>{% trans "Variation" %}</th>
+                        <th>{% trans "Room product" %}</th>
+                        <th>{% trans "Maximum number of people per room" %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item, variation, enabled, max_people in form.row_fields %}
+                        <tr>
+                            <td>{{ item }}</td>
+                            <td>{% if variation %}{{ variation }}{% endif %}</td>
+                            <td>{{ enabled }}</td>
+                            <td>
+                                {{ max_people }}
+                                {% for error in max_people.errors %}
+                                    <span class="help-block text-danger">{{ error }}</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4"><em>{% trans "This event has no products yet." %}</em></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>{% trans "Room types" %}</legend>
+            {% bootstrap_field form.same_product_only layout="control" %}
         </fieldset>
         <div class="form-group submit-group">
             <button type="submit" class="btn btn-primary btn-save">

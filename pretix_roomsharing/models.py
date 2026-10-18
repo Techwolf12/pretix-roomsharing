@@ -3,6 +3,32 @@ from django.utils.translation import gettext_lazy as _
 from pretix.base.models import LoggedModel
 
 
+class RoomProduct(models.Model):
+    """A product or variation whose buyers take part in roomsharing."""
+
+    event = models.ForeignKey(
+        "pretixbase.Event", on_delete=models.CASCADE, related_name="room_products"
+    )
+    item = models.ForeignKey(
+        "pretixbase.Item", on_delete=models.CASCADE, related_name="+"
+    )
+    variation = models.ForeignKey(
+        "pretixbase.ItemVariation",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+    max_people = models.PositiveIntegerField(
+        null=True, blank=True, verbose_name=_("Maximum number of people per room")
+    )
+
+    def __str__(self):
+        if self.variation_id:
+            return f"{self.item} – {self.variation}"
+        return str(self.item)
+
+
 class Room(LoggedModel):
     event = models.ForeignKey(
         "pretixbase.Event", on_delete=models.CASCADE, related_name="rooms"
@@ -10,6 +36,23 @@ class Room(LoggedModel):
     name = models.CharField(max_length=190)
     password = models.CharField(max_length=190, blank=True)
     created = models.DateTimeField(auto_now_add=True)
+    # The room type, taken from the ticket of the person who created the room.
+    item = models.ForeignKey(
+        "pretixbase.Item",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name=_("Product"),
+    )
+    variation = models.ForeignKey(
+        "pretixbase.ItemVariation",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name=_("Variation"),
+    )
 
     class Meta:
         unique_together = (("event", "name"),)

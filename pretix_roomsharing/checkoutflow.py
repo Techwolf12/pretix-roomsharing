@@ -254,7 +254,7 @@ class RoomStep(CartMixin, TemplateFlowStep):
         ctx["cart"] = self.get_cart()
         ctx["selected"] = self.cart_session.get("room_mode", "")
         ctx["order_has_room"] = requires_room(
-            self.request.event, (p.item for p in ctx["cart"]["positions"])
+            self.request.event, ctx["cart"]["positions"]
         )
         return ctx
 
