@@ -3,7 +3,24 @@ Roomsharing
 
 This is a plugin for `pretix`_. 
 
-Pretix roomsharing allows attendees to setup with which people they'd like to share a room
+Let attendees choose who they share a room with. Perfect for events with included accommodation, like conferences, camps, retreats and conventions.
+
+During checkout, attendees with a room ticket create a room and share its name and password with their friends, who then join it. They can also ask to be assigned a random room. Attendees can change their room later from their order page.
+
+Features
+--------
+
+* Choose which products, or individual product variations, include a room
+* Set a maximum number of people per room for each product or variation. Full rooms can't be joined.
+* Optionally only let people with the same ticket share a room, e.g. keep "Single" and "Double" rooms apart
+* Decide whether attendees may be assigned a random room, or must create or join one
+* Choose what roommates see about each other: order code, attendee name and/or answers to your own questions
+* Manage rooms in the backend: see who is in which room and how full it is, move orders between rooms, and change or delete rooms
+* Room statistics per product and date, with a metrics endpoint for monitoring
+* Respects your order modification deadline, and works with event series
+
+Requires pretix 2026.3 or newer.
+
 
 Development setup
 -----------------
@@ -45,7 +62,7 @@ License
 -------
 
 
-Copyright 2022 Christiaan de Die le Clercq (techwolf12)
+Copyright 2022-2026 Christiaan de Die le Clercq (techwolf12)
 
 Released under the terms of the Apache License 2.0
 
