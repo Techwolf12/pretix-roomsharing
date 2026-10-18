@@ -54,7 +54,7 @@ jobs:
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y gettext
       - name: Install dependencies
-        run: pip install build twine check-manifest
+        run: pip install build twine check-manifest pretix-plugin-build
       - name: Run check-manifest
         run: check-manifest .
       - name: Build package

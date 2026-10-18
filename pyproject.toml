@@ -4,7 +4,8 @@ dynamic = ["version"]
 description = "Pretix roomsharing allows attendees to setup with which people they'd like to share a room"
 readme = "README.rst"
 requires-python = ">=3.11"
-license = {file = "LICENSE"}
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 keywords = ["pretix"]
 authors = [
     {name = "Christiaan de Die le Clercq (techwolf12)", email = "contact@techwolf12.nl"},
@@ -25,7 +26,7 @@ build = "pretix_plugin_build.build:CustomBuild"
 
 [build-system]
 requires = [
-    "setuptools",
+    "setuptools>=77",
     "pretix-plugin-build",
 ]
 
