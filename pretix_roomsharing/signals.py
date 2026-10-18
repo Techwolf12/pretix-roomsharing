@@ -12,7 +12,7 @@ from pretix.base.logentrytypes import (
     OrderLogEntryType,
     log_entry_types,
 )
-from pretix.base.models import Event, Order, OrderPosition
+from pretix.base.models import Event, Order
 from pretix.base.settings import settings_hierarkey
 from pretix.base.signals import event_copy_data, order_placed
 from pretix.control.forms.filter import FilterForm
@@ -34,8 +34,10 @@ from .models import OrderRoom, Room
 from .utils import (
     can_change_room,
     join_error,
+    member_details,
     requires_room,
     room_capacity,
+    room_members,
     room_occupancy,
     room_type,
 )
@@ -150,15 +152,13 @@ def order_info(sender: Event, order: Order, **kwargs):
     # Show current room details
     try:
         c = order.orderroom
-        fellows_orders = OrderPosition.objects.filter(
-            order__status__in=(Order.STATUS_PENDING, Order.STATUS_PAID),
-            order__orderroom__room=c.room,
-            item__admission=True,
-        ).exclude(order=order)
-
+        fields = sender.settings.roomsharing__member_fields
         ctx["room"] = c.room
         ctx["is_admin"] = c.is_admin
-        ctx["fellows"] = fellows_orders
+        ctx["fellows"] = [
+            " – ".join(member_details(p, fields)) or _("Room member")
+            for p in room_members(c.room, exclude_order=order)
+        ]
         ctx["occupancy"] = room_occupancy(c.room)
         ctx["capacity"] = room_capacity(c.room)
     except OrderRoom.DoesNotExist:
@@ -299,3 +299,4 @@ def copy_room_products(sender, other, item_map, variation_map, **kwargs):
 
 
 settings_hierarkey.add_default("roomsharing__same_product_only", "False", bool)
+settings_hierarkey.add_default("roomsharing__member_fields", ["code"], list)

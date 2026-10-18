@@ -32,6 +32,7 @@ from .checkoutflow import RoomCreateForm, RoomJoinForm
 from .models import OrderRoom, Room, RoomProduct
 from .utils import (
     can_change_room,
+    member_field_choices,
     room_capacity,
     room_occupancy,
     room_products,
@@ -51,12 +52,26 @@ class RoomsharingSettingsForm(forms.Form):
         ),
         required=False,
     )
+    member_fields = forms.MultipleChoiceField(
+        label=_("Details shown about room members"),
+        help_text=_(
+            "Attendees see these details about the other people in their room on "
+            "their order page. Only select information people are comfortable "
+            "sharing with their roommates."
+        ),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop("event")
         super().__init__(*args, **kwargs)
         self.fields["same_product_only"].initial = (
             self.event.settings.roomsharing__same_product_only
+        )
+        self.fields["member_fields"].choices = member_field_choices(self.event)
+        self.fields["member_fields"].initial = (
+            self.event.settings.roomsharing__member_fields
         )
         existing = room_products(self.event)
 
@@ -95,6 +110,9 @@ class RoomsharingSettingsForm(forms.Form):
                 existing[lookup].delete()
         self.event.settings.roomsharing__same_product_only = self.cleaned_data[
             "same_product_only"
+        ]
+        self.event.settings.roomsharing__member_fields = self.cleaned_data[
+            "member_fields"
         ]
 
 

@@ -1,5 +1,5 @@
 from django.utils.translation import gettext as _
-from pretix.base.models import Order, OrderPosition
+from pretix.base.models import Order, OrderPosition, Question
 from pretix.base.timemachine import time_machine_now
 
 
@@ -102,6 +102,50 @@ def join_error(room, positions, exclude_order=None):
     if capacity is not None:
         if room_occupancy(room, exclude_order) + len(eligible) > capacity:
             return _("This room is full. Please choose a different room.")
+
+
+def member_field_choices(event) -> list:
+    """Return the fields staff can choose to show for room members."""
+    choices = [("code", _("Order code")), ("attendee_name", _("Attendee name"))]
+    for question in event.questions.exclude(type=Question.TYPE_FILE):
+        choices.append((f"question:{question.pk}", str(question.question)))
+    return choices
+
+
+def member_details(position, fields) -> list:
+    """Return the selected, non-empty details of a room member's ticket."""
+    answers = {a.question_id: a for a in position.answers.all()}
+    # Order-level questions only exist in newer pretix versions.
+    order_answers = getattr(position.order, "answers", None)
+    if order_answers is not None:
+        answers = {a.question_id: a for a in order_answers.all()} | answers
+
+    values = []
+    for field in fields:
+        if field == "code":
+            values.append(position.order.code)
+        elif field == "attendee_name":
+            values.append(position.attendee_name)
+        elif field.startswith("question:"):
+            answer = answers.get(int(field.split(":", 1)[1]))
+            values.append(str(answer) if answer else "")
+    return [v for v in values if v]
+
+
+def room_members(room, exclude_order=None) -> list:
+    """Return the room tickets of active orders in this room, in order."""
+    positions = (
+        OrderPosition.objects.filter(
+            order__orderroom__room=room,
+            order__status__in=(Order.STATUS_PENDING, Order.STATUS_PAID),
+        )
+        .select_related("order")
+        .prefetch_related("answers__question")
+        .order_by("order__datetime", "positionid")
+    )
+    if exclude_order:
+        positions = positions.exclude(order=exclude_order)
+    return room_positions(room.event, positions)
 
 
 def can_change_room(order) -> bool:

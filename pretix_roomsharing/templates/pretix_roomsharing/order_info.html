@@ -40,7 +40,7 @@
             </p>
                 <ul>
                     {% for f in fellows %}
-                    <li>{{ f.order.code }}</li>
+                    <li>{{ f }}</li>
                     {% empty %}
                         <li><em>{% trans "Nobody has joined your room yet. Go tell your friends about it!" %}</em></li>
                     {% endfor %}
