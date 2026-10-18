@@ -3,7 +3,7 @@ name = "pretix-roomsharing"
 dynamic = ["version"]
 description = "Pretix roomsharing allows attendees to setup with which people they'd like to share a room"
 readme = "README.rst"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 license = {file = "LICENSE"}
 keywords = ["pretix"]
 authors = [

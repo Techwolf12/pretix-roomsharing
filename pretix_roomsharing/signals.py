@@ -6,9 +6,14 @@ from django.http import HttpRequest
 from django.template.loader import get_template
 from django.urls import resolve, reverse
 from django.utils.translation import gettext_lazy as _
+from pretix.base.logentrytypes import (
+    EventLogEntryType,
+    OrderLogEntryType,
+    log_entry_types,
+)
 from pretix.base.models import Event, Order, OrderPosition
 from pretix.base.settings import settings_hierarkey
-from pretix.base.signals import logentry_display, order_placed
+from pretix.base.signals import order_placed
 from pretix.control.forms.filter import FilterForm
 from pretix.control.signals import (
     nav_event,
@@ -156,30 +161,37 @@ def control_order_info(sender: Event, request, order: Order, **kwargs):
     return template.render(ctx, request=request)
 
 
-@receiver(signal=logentry_display, dispatch_uid="room_logentry_display")
-def shipping_logentry_display(sender, logentry, **kwargs):
-    if not logentry.action_type.startswith("pretix_roomsharing"):
-        return
-
-    plains = {
+@log_entry_types.new_from_dict(
+    {
         "pretix_roomsharing.order.left": _("The user left a room."),
         "pretix_roomsharing.order.joined": _("The user joined a room."),
         "pretix_roomsharing.order.created": _("The user created a new room."),
         "pretix_roomsharing.order.changed": _("The user changed a room password."),
         "pretix_roomsharing.order.deleted": _("The room has been deleted."),
-        "pretix_roomsharing.room.deleted": _("The room has been changed."),
-        "pretix_roomsharing.room.changed": _("The room has been deleted."),
     }
+)
+class RoomOrderLogEntryType(OrderLogEntryType):
+    pass
 
-    if logentry.action_type in plains:
-        return plains[logentry.action_type]
+
+@log_entry_types.new_from_dict(
+    {
+        "pretix_roomsharing.room.changed": _("The room has been changed."),
+        "pretix_roomsharing.room.deleted": _("The room has been deleted."),
+    }
+)
+class RoomLogEntryType(EventLogEntryType):
+    object_link_wrapper = _("Room {val}")
+    object_link_viewname = "plugins:pretix_roomsharing:event.room.detail"
+    object_link_argname = "pk"
+    content_type = Room
 
 
 @receiver(nav_event, dispatch_uid="room_nav")
 def control_nav_event(sender, request=None, **kwargs):
     url = resolve(request.path_info)
     if not request.user.has_event_permission(
-        request.organizer, request.event, "can_change_orders", request=request
+        request.organizer, request.event, "event.orders:write", request=request
     ):
         return []
     return [

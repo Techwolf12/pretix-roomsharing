@@ -50,3 +50,51 @@ def test_control_room_change(client, organizer, order, room):
     orderroom = OrderRoom.objects.get(order=order)
     assert orderroom.room == room
     assert orderroom.is_admin
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url,permission,status",
+    [
+        ("/control/event/dummy/dummy/rooms/", "event.orders:read", 403),
+        ("/control/event/dummy/dummy/rooms/", "event.orders:write", 200),
+        ("/control/event/dummy/dummy/rooms/stats/", "event.orders:read", 200),
+        ("/control/event/dummy/dummy/roomsharing/", "event.orders:write", 403),
+        (
+            "/control/event/dummy/dummy/roomsharing/",
+            "event.settings.general:write",
+            200,
+        ),
+    ],
+)
+def test_control_permissions(client, organizer, event, url, permission, status):
+    _login(client, organizer, limit_event_permissions={permission: True})
+    assert client.get(url).status_code == status
+
+
+@pytest.mark.django_db
+def test_rooms_nav_hidden_without_permission(client, organizer, event):
+    _login(client, organizer, limit_event_permissions={"event.orders:read": True})
+    r = client.get("/control/event/dummy/dummy/")
+    assert "/control/event/dummy/dummy/rooms/" not in r.content.decode()
+
+
+@pytest.mark.django_db
+def test_plugin_page_links(client, organizer, event):
+    _login(client, organizer, all_event_permissions=True)
+    content = client.get("/control/event/dummy/dummy/settings/plugins").content.decode()
+    assert "/control/event/dummy/dummy/roomsharing/" in content
+    assert "/control/event/dummy/dummy/rooms/" in content
+
+
+@pytest.mark.django_db
+def test_room_log_entries(event, room, order):
+    room.log_action("pretix_roomsharing.room.changed", data={})
+    order.log_action("pretix_roomsharing.order.joined", data={"room": room.pk})
+    room_entry, order_entry = (
+        room.all_logentries().get(),
+        order.all_logentries().get(),
+    )
+    assert room_entry.display() == "The room has been changed."
+    assert f"/control/event/dummy/dummy/rooms/{room.pk}/" in room_entry.display_object
+    assert order_entry.display() == "The user joined a room."

@@ -4,7 +4,7 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <div class="pull-right">
-            {% if 'can_change_orders' in request.eventpermset %}
+            {% if 'event.orders:write' in request.eventpermset %}
                 <a href="{% url "plugins:pretix_roomsharing:control.order.room.modify" event=request.event.slug organizer=request.event.organizer.slug code=order.code %}">
                     <span class="fa fa-edit"></span>
                     {% trans "Change" %}

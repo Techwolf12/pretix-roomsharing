@@ -3,9 +3,9 @@ from django.utils.translation import gettext_lazy
 from . import __version__
 
 try:
-    from pretix.base.plugins import PluginConfig
+    from pretix.base.plugins import PLUGIN_LEVEL_EVENT, PluginConfig
 except ImportError:
-    raise RuntimeError("Please use pretix 2.7 or above to run this plugin!")
+    raise RuntimeError("Please use pretix 2026.3 or above to run this plugin!")
 
 
 class PluginApp(PluginConfig):
@@ -23,6 +23,22 @@ class PluginApp(PluginConfig):
         visible = True
         version = __version__
         category = "FEATURE"
+        level = PLUGIN_LEVEL_EVENT
+        compatibility = "pretix>=2026.3.0"
+        settings_links = [
+            (
+                (gettext_lazy("Settings"), gettext_lazy("Roomsharing")),
+                "plugins:pretix_roomsharing:control.room.settings",
+                {},
+            ),
+        ]
+        navigation_links = [
+            (
+                (gettext_lazy("Rooms"),),
+                "plugins:pretix_roomsharing:event.room.list",
+                {},
+            ),
+        ]
 
     def ready(self):
         from . import signals  # NOQA

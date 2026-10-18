@@ -57,7 +57,7 @@ class SettingsView(EventSettingsViewMixin, EventSettingsFormView):
     model = Event
     form_class = RoomsharingSettingsForm
     template_name = "pretix_roomsharing/settings.html"
-    permission = "can_change_settings"
+    permission = "event.settings.general:write"
     # TODO: Set user public name field
 
     def get_success_url(self):
@@ -257,7 +257,7 @@ class ControlRoomForm(forms.ModelForm):
 
 
 class ControlRoomChange(OrderView):
-    permission = "can_change_orders"
+    permission = "event.orders:write"
     template_name = "pretix_roomsharing/control_order_room_change.html"
 
     @cached_property
@@ -290,7 +290,7 @@ class ControlRoomChange(OrderView):
 
 
 class RoomList(EventPermissionRequiredMixin, ListView):
-    permission = "can_change_orders"
+    permission = "event.orders:write"
     template_name = "pretix_roomsharing/control_list.html"
     context_object_name = "rooms"
     paginate_by = 25
@@ -320,7 +320,7 @@ class RoomForm(forms.ModelForm):
 
 
 class RoomDetail(EventPermissionRequiredMixin, UpdateView):
-    permission = "can_change_orders"
+    permission = "event.orders:write"
     template_name = "pretix_roomsharing/control_detail.html"
     context_object_name = "rooms"
     form_class = RoomForm
@@ -353,7 +353,7 @@ class RoomDetail(EventPermissionRequiredMixin, UpdateView):
 
 
 class RoomDelete(EventPermissionRequiredMixin, CompatDeleteView):
-    permission = "can_change_orders"
+    permission = "event.orders:write"
     template_name = "pretix_roomsharing/control_delete.html"
     context_object_name = "rooms"
 
@@ -473,7 +473,7 @@ class StatsMixin:
 
 class StatsView(StatsMixin, EventPermissionRequiredMixin, TemplateView):
     template_name = "pretix_roomsharing/control_stats.html"
-    permission = "can_view_orders"
+    permission = "event.orders:read"
 
     def get_context_data(self, **kwargs):
         def qs_by_item(qs):
