@@ -25,7 +25,7 @@ from pretix.presale.views.cart import cart_session
 
 from .checkoutflow import RoomStep
 from .models import OrderRoom, Room
-from .utils import requires_room
+from .utils import can_change_room, requires_room
 
 logger = logging.getLogger(__name__)
 
@@ -117,7 +117,7 @@ def order_info(sender: Event, order: Order, **kwargs):
     # Show link for user to change room
     ctx["order_has_room"] = requires_room(
         sender, (p.item for p in order.positions.select_related("item"))
-    )
+    ) and can_change_room(order)
 
     # Show current room details
     try:

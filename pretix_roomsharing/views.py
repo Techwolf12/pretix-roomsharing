@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.db.models import Count, Exists, OuterRef
 from django.forms.widgets import CheckboxSelectMultiple
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -72,6 +72,7 @@ class SettingsView(EventSettingsViewMixin, EventSettingsFormView):
 
 from .checkoutflow import RoomCreateForm, RoomJoinForm
 from .models import OrderRoom, Room
+from .utils import can_change_room
 
 
 class RoomChangePasswordForm(forms.Form):
@@ -95,16 +96,11 @@ class OrderRoomChange(EventViewMixin, OrderDetailMixin, TemplateView):
     def dispatch(self, request, *args, **kwargs):
         self.request = request
 
-        if not self.order:
-            raise Http404(
-                _("Unknown order code or not authorized to access this order.")
-            )
+        resp = self.verify_order_access()
+        if resp:
+            return resp
 
-        if not self.order.can_modify_answers:
-            messages.error(request, _("The room for this order cannot be changed."))
-            return redirect(self.get_order_url())
-
-        if self.order.status not in (Order.STATUS_CANCELED, Order.STATUS_EXPIRED):
+        if not can_change_room(self.order):
             messages.error(request, _("The room for this order cannot be changed."))
             return redirect(self.get_order_url())
 
@@ -247,11 +243,6 @@ class OrderRoomChange(EventViewMixin, OrderDetailMixin, TemplateView):
             ctx["selected"] = self.request.POST.get("room_mode", "none")
 
         return ctx
-
-    def dispatch(self, request, *args, **kwargs):
-        self.request = request
-
-        return super().dispatch(request, *args, **kwargs)
 
 
 class ControlRoomForm(forms.ModelForm):
