@@ -89,3 +89,16 @@ def test_order_info_hides_change_link_for_canceled_order(event, room_order):
     room_order.status = Order.STATUS_CANCELED
     room_order.save()
     assert "Change details" not in order_info(event, order=room_order)
+
+
+@pytest.mark.django_db
+def test_join_form_missing_password_error_on_password_field(event):
+    from pretix_roomsharing.checkoutflow import RoomJoinForm
+
+    event.rooms.create(name="Room", password="secret")
+    form = RoomJoinForm(
+        event=event, prefix="join", data={"join-name": "Room", "join-password": ""}
+    )
+    assert not form.is_valid()
+    assert "password" in form.errors
+    assert "name" not in form.errors

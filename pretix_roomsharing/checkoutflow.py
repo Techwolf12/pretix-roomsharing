@@ -111,7 +111,7 @@ class RoomJoinForm(forms.Form):
         if not password:
             raise forms.ValidationError(
                 {
-                    "name": self.error_messages["required"],
+                    "password": self.error_messages["required"],
                 },
                 code="required",
             )

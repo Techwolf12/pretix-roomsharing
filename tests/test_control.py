@@ -98,3 +98,35 @@ def test_room_log_entries(event, room, order):
     assert room_entry.display() == "The room has been changed."
     assert f"/control/event/dummy/dummy/rooms/{room.pk}/" in room_entry.display_object
     assert order_entry.display() == "The user joined a room."
+
+
+@pytest.mark.django_db
+def test_rooms_nav(client, organizer, event):
+    _login(client, organizer, all_event_permissions=True)
+    content = client.get("/control/event/dummy/dummy/rooms/").content.decode()
+    assert "/control/event/dummy/dummy/rooms/stats/" in content
+
+
+@pytest.mark.django_db
+def test_stats_page(client, organizer, event, order):
+    _login(client, organizer, all_event_permissions=True)
+    r = client.get("/control/event/dummy/dummy/rooms/stats/")
+    assert r.status_code == 200
+    content = r.content.decode()
+    assert "Room statistics" in content
+    # Rendered inside the backend layout, so the event navigation is present.
+    assert "/control/event/dummy/dummy/rooms/" in content
+    total = next(
+        row for row in r.context["ticket_stats"] if row[0] == "All tickets, total"
+    )
+    assert sum(sum(v.values()) for v in total[1].values()) == 1
+
+
+@pytest.mark.django_db
+def test_delete_page_cancel_link(client, organizer, room):
+    _login(client, organizer, all_event_permissions=True)
+    r = client.get(f"/control/event/dummy/dummy/rooms/{room.pk}/delete")
+    assert (
+        'href="/control/event/dummy/dummy/rooms/" class="btn btn-default btn-cancel"'
+        in (r.content.decode())
+    )

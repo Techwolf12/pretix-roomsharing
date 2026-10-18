@@ -25,7 +25,7 @@ urlpatterns = [
     path(
         r"control/event/<str:organizer>/<str:event>/rooms/stats/",
         StatsView.as_view(),
-        name="event.stats",
+        name="event.room.stats",
     ),
     path(
         r"control/event/<str:organizer>/<str:event>/rooms/",

@@ -13,7 +13,7 @@
         </p>
         <p>{% trans "All orders connected to this room will be removed from the room first." %}</p>
         <div class="form-group submit-group">
-            <a href="{% url "control:event.items" organizer=request.event.organizer.slug event=request.event.slug %}" class="btn btn-default btn-cancel">
+            <a href="{% url "plugins:pretix_roomsharing:event.room.list" organizer=request.event.organizer.slug event=request.event.slug %}" class="btn btn-default btn-cancel">
                 {% trans "Cancel" %}
             </a>
             <button type="submit" class="btn btn-danger btn-save">

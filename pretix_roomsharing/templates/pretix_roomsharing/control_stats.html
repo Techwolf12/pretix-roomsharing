@@ -1,11 +1,11 @@
+{% extends "pretixcontrol/event/base.html" %}
 {% load i18n %}
-{% load eventsignal %}
-{% load bootstrap3 %}
 {% load getitem %}
 {% load room_tags %}
-{% block inner %}
+{% block title %}{% trans "Room statistics" %}{% endblock %}
+{% block content %}
+    <h1>{% trans "Room statistics" %}</h1>
     <fieldset>
-        <legend>{% trans "Statistics" %}</legend>
 
         <div class="table-responsive">
             <table class="table table-condensed table-hover">

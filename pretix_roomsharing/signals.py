@@ -194,21 +194,35 @@ def control_nav_event(sender, request=None, **kwargs):
         request.organizer, request.event, "event.orders:write", request=request
     ):
         return []
+    kwargs = {
+        "event": request.event.slug,
+        "organizer": request.event.organizer.slug,
+    }
+    in_plugin = url.namespace == "plugins:pretix_roomsharing"
     return [
         {
             "label": _("Rooms"),
-            "url": reverse(
-                "plugins:pretix_roomsharing:event.room.list",
-                kwargs={
-                    "event": request.event.slug,
-                    "organizer": request.event.organizer.slug,
-                },
-            ),
-            "active": (
-                url.namespace == "plugins:pretix_roomsharing"
-                and "rooms" in url.url_name
-            ),
+            "url": reverse("plugins:pretix_roomsharing:event.room.list", kwargs=kwargs),
+            "active": in_plugin and url.url_name.startswith("event.room."),
             "icon": "group",
+            "children": [
+                {
+                    "label": _("Rooms"),
+                    "url": reverse(
+                        "plugins:pretix_roomsharing:event.room.list", kwargs=kwargs
+                    ),
+                    "active": in_plugin
+                    and url.url_name
+                    in ("event.room.list", "event.room.detail", "event.room.delete"),
+                },
+                {
+                    "label": _("Statistics"),
+                    "url": reverse(
+                        "plugins:pretix_roomsharing:event.room.stats", kwargs=kwargs
+                    ),
+                    "active": in_plugin and url.url_name == "event.room.stats",
+                },
+            ],
         }
     ]
 

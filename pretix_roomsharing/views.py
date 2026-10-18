@@ -402,9 +402,7 @@ class StatsMixin:
             {
                 "id": "tickets_total",
                 "label": _("All tickets, total"),
-                "qs": qs.filter(
-                    order__status=Order.STATUS_PENDING, order__require_approval=True
-                ),
+                "qs": qs,
                 "qs_cliq": True,
             },
             {
