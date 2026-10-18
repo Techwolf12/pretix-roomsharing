@@ -6,6 +6,12 @@
 {% block title %}{% trans "Room list" %}{% endblock %}
 {% block content %}
     <h1>{% trans "Room list" %}</h1>
+    <p>
+        <a href="{% url "plugins:pretix_roomsharing:event.room.add" organizer=request.event.organizer.slug event=request.event.slug %}" class="btn btn-default">
+            <span class="fa fa-plus"></span>
+            {% trans "Create a new room" %}
+        </a>
+    </p>
     {% if rooms|length == 0 %}
         <div class="empty-collection">
             <p>

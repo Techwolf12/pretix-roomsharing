@@ -20,7 +20,7 @@ from django_scopes import scopes_disabled
 from pretix.base.models import Event, Order, OrderPosition, OrderRefund
 from pretix.base.views.metrics import unauthed_response
 from pretix.control.permissions import EventPermissionRequiredMixin
-from pretix.control.views import UpdateView
+from pretix.control.views import CreateView, UpdateView
 from pretix.control.views.event import EventSettingsViewMixin
 from pretix.control.views.orders import OrderView
 from pretix.helpers.compat import CompatDeleteView
@@ -401,6 +401,7 @@ class ControlRoomChange(OrderView):
     def post(self, request, *args, **kwargs):
         if self.form.is_valid():
             self.form.save()
+            _log_move(self.order, self.form.instance.room, request.user)
             messages.success(request, _("Great, we saved your changes!"))
             return redirect(self.get_order_url())
         messages.error(
@@ -478,6 +479,96 @@ class RoomForm(forms.ModelForm):
         return name
 
 
+def _log_move(order, room, user):
+    order.log_action(
+        "pretix_roomsharing.order.moved",
+        data={"room": room.pk, "room_name": room.name},
+        user=user,
+    )
+
+
+def _room_url(event, name, **kwargs):
+    return reverse(
+        f"plugins:pretix_roomsharing:{name}",
+        kwargs={"organizer": event.organizer.slug, "event": event.slug, **kwargs},
+    )
+
+
+class RoomCreate(EventPermissionRequiredMixin, CreateView):
+    permission = "event.orders:write"
+    template_name = "pretix_roomsharing/control_create.html"
+    form_class = RoomForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["instance"] = Room(event=self.request.event)
+        return kwargs
+
+    @transaction.atomic
+    def form_valid(self, form):
+        room = form.save()
+        room.log_action(
+            "pretix_roomsharing.room.created",
+            data={"name": room.name, "room_number": room.room_number},
+            user=self.request.user,
+        )
+        messages.success(
+            self.request,
+            _("The room has been created. You can now add orders to it."),
+        )
+        return redirect(_room_url(self.request.event, "event.room.detail", pk=room.pk))
+
+
+class RoomAddOrderForm(forms.Form):
+    order = forms.CharField(label=_("Order code"), max_length=190)
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop("event")
+        super().__init__(*args, **kwargs)
+
+    def clean_order(self):
+        code = self.cleaned_data["order"].strip().upper()
+        # Accept codes copied with the event slug prefix, e.g. "DEMO-ABC12".
+        code = code.removeprefix(f"{self.event.slug.upper()}-")
+        try:
+            return self.event.orders.get(code=code)
+        except Order.DoesNotExist:
+            raise forms.ValidationError(_("There is no order with this code."))
+
+
+class RoomAddOrder(EventPermissionRequiredMixin, View):
+    """Move an order into a room (staff only, not checked against the room's
+    limits)."""
+
+    permission = "event.orders:write"
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        room = get_object_or_404(request.event.rooms, pk=kwargs["pk"])
+        form = RoomAddOrderForm(event=request.event, data=request.POST)
+        if not form.is_valid():
+            messages.error(request, " ".join(form.errors["order"]))
+        else:
+            order = form.cleaned_data["order"]
+            OrderRoom.objects.update_or_create(
+                order=order, defaults={"room": room, "is_admin": False}
+            )
+            _log_move(order, room, request.user)
+            messages.success(
+                request,
+                _("Order {code} has been added to this room.").format(code=order.code),
+            )
+            capacity = room_capacity(room)
+            if capacity is not None and room_occupancy(room) > capacity:
+                messages.warning(
+                    request,
+                    _(
+                        "This room now has more people than its maximum of {max}."
+                    ).format(max=capacity),
+                )
+        return redirect(_room_url(request.event, "event.room.detail", pk=room.pk))
+
+
 class RoomDetail(EventPermissionRequiredMixin, UpdateView):
     permission = "event.orders:write"
     template_name = "pretix_roomsharing/control_detail.html"
@@ -510,6 +601,7 @@ class RoomDetail(EventPermissionRequiredMixin, UpdateView):
         ctx["orders"] = self.object.orderrooms.select_related("order")
         ctx["occupancy"] = room_occupancy(self.object)
         ctx["capacity"] = room_capacity(self.object)
+        ctx["add_order_form"] = RoomAddOrderForm(event=self.request.event)
         return ctx
 
 

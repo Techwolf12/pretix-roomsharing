@@ -6,6 +6,8 @@ from .views import (
     ControlRoomChange,
     MetricsView,
     OrderRoomChange,
+    RoomAddOrder,
+    RoomCreate,
     RoomDelete,
     RoomDetail,
     RoomList,
@@ -33,6 +35,16 @@ urlpatterns = [
         r"control/event/<str:organizer>/<str:event>/rooms/",
         RoomList.as_view(),
         name="event.room.list",
+    ),
+    path(
+        r"control/event/<str:organizer>/<str:event>/rooms/add/",
+        RoomCreate.as_view(),
+        name="event.room.add",
+    ),
+    path(
+        r"control/event/<str:organizer>/<str:event>/rooms/<int:pk>/add-order",
+        RoomAddOrder.as_view(),
+        name="event.room.add_order",
     ),
     path(
         r"control/event/<str:organizer>/<str:event>/rooms/<int:pk>/",

@@ -13,36 +13,6 @@
                 <legend>{% trans "Change room" %}</legend>
                 {% bootstrap_form form layout="horizontal" %}
             </fieldset>
-            <fieldset>
-                <legend>{% trans "Connected orders" %}</legend>
-                <p>
-                    {% if capacity %}
-                        {% blocktrans trimmed %}
-                            {{ occupancy }} of {{ capacity }} places in this room are taken.
-                        {% endblocktrans %}
-                    {% else %}
-                        {% blocktrans trimmed count occupancy=occupancy %}
-                            {{ occupancy }} person is in this room.
-                        {% plural %}
-                            {{ occupancy }} people are in this room.
-                        {% endblocktrans %}
-                    {% endif %}
-                </p>
-                <ul>
-                    {% for oc in orders %}
-                        <li>
-                            <a href="{% url "control:event.order" event=request.event.slug organizer=request.event.organizer.slug code=oc.order.code %}">
-                                {% blocktrans with code=oc.order.code %}Order {{ code }}{% endblocktrans %}
-                            </a></li>
-                    {% empty %}
-                        <p>
-                            <em>
-                                {% trans "No orders connected. Maybe someone created this room and hasn't yet completed checkout." %}
-                            </em>
-                        </p>
-                    {% endfor %}
-                </ul>
-            </fieldset>
         </div>
         <div class="form-group submit-group">
             <button type="submit" class="btn btn-primary btn-save">
@@ -50,4 +20,53 @@
             </button>
         </div>
     </form>
+    <fieldset>
+        <legend>{% trans "Connected orders" %}</legend>
+        <p>
+            {% if capacity %}
+                {% blocktrans trimmed %}
+                    {{ occupancy }} of {{ capacity }} places in this room are taken.
+                {% endblocktrans %}
+            {% else %}
+                {% blocktrans trimmed count occupancy=occupancy %}
+                    {{ occupancy }} person is in this room.
+                {% plural %}
+                    {{ occupancy }} people are in this room.
+                {% endblocktrans %}
+            {% endif %}
+        </p>
+        <ul>
+            {% for oc in orders %}
+                <li>
+                    <a href="{% url "control:event.order" event=request.event.slug organizer=request.event.organizer.slug code=oc.order.code %}">
+                        {% blocktrans with code=oc.order.code %}Order {{ code }}{% endblocktrans %}
+                    </a></li>
+            {% empty %}
+                <p>
+                    <em>
+                        {% trans "No orders connected. Maybe someone created this room and hasn't yet completed checkout." %}
+                    </em>
+                </p>
+            {% endfor %}
+        </ul>
+        <form action="{% url "plugins:pretix_roomsharing:event.room.add_order" organizer=request.event.organizer.slug event=request.event.slug pk=object.pk %}"
+              method="post" class="form-inline">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ add_order_form.order.id_for_label }}">{% trans "Add order to this room" %}</label>
+                <input type="text" name="{{ add_order_form.order.html_name }}" id="{{ add_order_form.order.id_for_label }}"
+                       class="form-control" placeholder="{% trans "Order code" %}" required>
+            </div>
+            <button type="submit" class="btn btn-default">
+                <span class="fa fa-plus"></span>
+                {% trans "Add" %}
+            </button>
+            <p class="help-block">
+                {% blocktrans trimmed %}
+                    Moves the order into this room, also if it's currently in another room. Staff changes are not
+                    checked against the room's maximum size or ticket type.
+                {% endblocktrans %}
+            </p>
+        </form>
+    </fieldset>
 {% endblock %}

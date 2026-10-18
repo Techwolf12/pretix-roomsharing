@@ -196,6 +196,9 @@ def control_order_info(sender: Event, request, order: Order, **kwargs):
         "pretix_roomsharing.order.created": _("The user created a new room."),
         "pretix_roomsharing.order.changed": _("The user changed a room password."),
         "pretix_roomsharing.order.deleted": _("The room has been deleted."),
+        "pretix_roomsharing.order.moved": _(
+            'The order has been moved to the room "{room_name}".'
+        ),
         "pretix_roomsharing.order.join_failed": _(
             'The order could not be added to the room "{room_name}": {reason}'
         ),
@@ -207,6 +210,7 @@ class RoomOrderLogEntryType(OrderLogEntryType):
 
 @log_entry_types.new_from_dict(
     {
+        "pretix_roomsharing.room.created": _("The room has been created."),
         "pretix_roomsharing.room.changed": _("The room has been changed."),
         "pretix_roomsharing.room.deleted": _("The room has been deleted."),
     }
@@ -244,7 +248,12 @@ def control_nav_event(sender, request=None, **kwargs):
                     ),
                     "active": in_plugin
                     and url.url_name
-                    in ("event.room.list", "event.room.detail", "event.room.delete"),
+                    in (
+                        "event.room.list",
+                        "event.room.add",
+                        "event.room.detail",
+                        "event.room.delete",
+                    ),
                 },
                 {
                     "label": _("Statistics"),

@@ -1,0 +1,25 @@
+{% extends "pretixcontrol/event/base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% block title %}{% trans "Create a new room" %}{% endblock %}
+{% block content %}
+    <h1>{% trans "Create a new room" %}</h1>
+    <p>
+        {% blocktrans trimmed %}
+            After creating the room, you can add orders to it. Attendees can only join the room themselves if it has a
+            password; without one, only staff can add people.
+        {% endblocktrans %}
+    </p>
+    <form action="" method="post" class="form-horizontal">
+        {% csrf_token %}
+        {% bootstrap_form form layout="horizontal" %}
+        <div class="form-group submit-group">
+            <a href="{% url "plugins:pretix_roomsharing:event.room.list" organizer=request.event.organizer.slug event=request.event.slug %}" class="btn btn-default btn-cancel">
+                {% trans "Cancel" %}
+            </a>
+            <button type="submit" class="btn btn-primary btn-save">
+                {% trans "Create" %}
+            </button>
+        </div>
+    </form>
+{% endblock %}
