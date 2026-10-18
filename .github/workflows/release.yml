@@ -1,0 +1,61 @@
+name: Release
+
+# Publishes to PyPI when a GitHub release is published, using PyPI trusted publishing
+# (no API token). Bump __version__ in pretix_roomsharing/__init__.py first; the release tag must
+# match it, with or without a leading "v".
+on:
+  release:
+    types: [ published ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y gettext
+      - name: Install dependencies
+        run: pip install build twine check-manifest
+      - name: Check that the release tag matches the package version
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          version=$(sed -n 's/^__version__ = "\(.*\)"/\1/p' pretix_roomsharing/__init__.py)
+          if [ -z "$version" ] || [ "${TAG#v}" != "$version" ]; then
+            echo "::error::Release tag $TAG does not match __version__ $version"
+            exit 1
+          fi
+      - name: Run check-manifest
+        run: check-manifest .
+      - name: Build package
+        run: python -m build
+      - name: Check package
+        run: twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/pretix-roomsharing/
+    permissions:
+      id-token: write  # required for trusted publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
