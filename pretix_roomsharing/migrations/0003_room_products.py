@@ -5,6 +5,9 @@ import json
 from django.db import migrations, models
 from django_scopes import scopes_disabled
 
+# Historical models don't have pretix's custom managers (OrderPosition has no
+# "objects" there), so all queries in this migration use _default_manager.
+
 
 def convert_room_products(apps, schema_editor):
     """Convert the old roomsharing__products setting into RoomProduct rows."""
@@ -14,17 +17,19 @@ def convert_room_products(apps, schema_editor):
     RoomProduct = apps.get_model("pretix_roomsharing", "RoomProduct")
 
     with scopes_disabled():
-        for setting in SettingsStore.objects.filter(key="roomsharing__products"):
+        for setting in SettingsStore._default_manager.filter(
+            key="roomsharing__products"
+        ):
             try:
                 item_ids = [int(i) for i in json.loads(setting.value or "[]")]
             except (TypeError, ValueError):
                 item_ids = []
-            for item in Item.objects.filter(
+            for item in Item._default_manager.filter(
                 event_id=setting.object_id, pk__in=item_ids
             ):
-                variations = list(ItemVariation.objects.filter(item=item))
+                variations = list(ItemVariation._default_manager.filter(item=item))
                 for variation in variations or [None]:
-                    RoomProduct.objects.create(
+                    RoomProduct._default_manager.create(
                         event_id=setting.object_id, item=item, variation=variation
                     )
             setting.delete()
@@ -37,9 +42,9 @@ def backfill_room_types(apps, schema_editor):
     OrderPosition = apps.get_model("pretixbase", "OrderPosition")
 
     with scopes_disabled():
-        for room in Room.objects.filter(item__isnull=True):
+        for room in Room._default_manager.filter(item__isnull=True):
             products = set(
-                RoomProduct.objects.filter(event_id=room.event_id).values_list(
+                RoomProduct._default_manager.filter(event_id=room.event_id).values_list(
                     "item_id", "variation_id"
                 )
             )
@@ -50,7 +55,7 @@ def backfill_room_types(apps, schema_editor):
             )
             if not orderroom or not products:
                 continue
-            positions = OrderPosition.objects.filter(
+            positions = OrderPosition._default_manager.filter(
                 order_id=orderroom.order_id, canceled=False
             ).order_by("positionid")
             for position in positions:

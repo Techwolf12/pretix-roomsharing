@@ -1,7 +1,6 @@
 import importlib
 import pytest
 from decimal import Decimal
-from django.apps import apps
 from pretix.base.models import Event
 
 from pretix_roomsharing.models import OrderRoom, RoomProduct
@@ -12,6 +11,18 @@ from pretix_roomsharing.views import RoomsharingSettingsForm
 migration_0003 = importlib.import_module(
     "pretix_roomsharing.migrations.0003_room_products"
 )
+
+
+@pytest.fixture
+def historical_apps(settings):
+    """The models as migration 0003 sees them, e.g. without custom managers."""
+    from django.db import connection
+    from django.db.migrations.loader import MigrationLoader
+
+    # pretix's test settings disable migrations outside of GitHub Actions.
+    settings.MIGRATION_MODULES = {}
+    loader = MigrationLoader(connection, ignore_no_migrations=True)
+    return loader.project_state(("pretix_roomsharing", "0003_room_products")).apps
 
 
 @pytest.fixture
@@ -129,9 +140,9 @@ def test_settings_page(client, organizer, event, item):
     assert event.all_logentries().filter(action_type="pretix.event.settings").exists()
 
 
-def test_migration_converts_old_setting(event, item, variation_item):
+def test_migration_converts_old_setting(event, item, variation_item, historical_apps):
     event.settings.set("roomsharing__products", [str(item.pk), str(variation_item.pk)])
-    migration_0003.convert_room_products(apps, None)
+    migration_0003.convert_room_products(historical_apps, None)
 
     products = set(event.room_products.values_list("item_id", "variation_id"))
     single, double = variation_item.variations.order_by("pk")
@@ -144,12 +155,12 @@ def test_migration_converts_old_setting(event, item, variation_item):
     assert event.settings.get("roomsharing__products") is None
 
 
-def test_migration_backfills_room_type(event, item, order):
+def test_migration_backfills_room_type(event, item, order, historical_apps):
     event.room_products.create(item=item)
     room = event.rooms.create(name="Room", password="secret")
     OrderRoom.objects.create(order=order, room=room, is_admin=True)
 
-    migration_0003.backfill_room_types(apps, None)
+    migration_0003.backfill_room_types(historical_apps, None)
     room.refresh_from_db()
     assert room.item == item
     assert room.variation is None
