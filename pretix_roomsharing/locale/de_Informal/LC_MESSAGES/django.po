@@ -1,0 +1,767 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-20 20:56+0200\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Christiaan de Die le Clercq (techwolf12)\n"
+"Language-Team: German (informal)\n"
+"Language: de_Informal\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: pretix_roomsharing/apps.py:18 pretix_roomsharing/apps.py:30
+#: pretix_roomsharing/signals.py:60
+#: pretix_roomsharing/templates/pretix_roomsharing/order_info.html:14
+msgid "Roomsharing"
+msgstr "Zimmerteilung"
+
+#: pretix_roomsharing/apps.py:21
+msgid ""
+"Pretix roomsharing allows attendees to setup with which people they'd like "
+"to share a room"
+msgstr ""
+"Mit pretix Zimmerteilung können Teilnehmende festlegen, mit wem sie sich ein "
+"Zimmer teilen möchten"
+
+#: pretix_roomsharing/apps.py:30
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: pretix_roomsharing/apps.py:37 pretix_roomsharing/signals.py:239
+#: pretix_roomsharing/signals.py:245
+msgid "Rooms"
+msgstr "Zimmer"
+
+#: pretix_roomsharing/checkoutflow.py:19
+msgid ""
+"There already is a room with that name. If you want to join a room already "
+"created by your friends, please choose to join a room instead of creating a "
+"new one."
+msgstr ""
+"Es gibt bereits ein Zimmer mit diesem Namen. Wenn du einem Zimmer beitreten "
+"möchtest, das deine Freund*innen bereits erstellt haben, wähle bitte „Zimmer "
+"beitreten“, statt ein neues zu erstellen."
+
+#: pretix_roomsharing/checkoutflow.py:22 pretix_roomsharing/checkoutflow.py:84
+msgid "This field is required."
+msgstr "Dieses Feld ist erforderlich."
+
+#: pretix_roomsharing/checkoutflow.py:27 pretix_roomsharing/checkoutflow.py:92
+#: pretix_roomsharing/signals.py:272
+#: pretix_roomsharing/templates/pretix_roomsharing/control_list.html:28
+msgid "Room name"
+msgstr "Zimmername"
+
+#: pretix_roomsharing/checkoutflow.py:32 pretix_roomsharing/checkoutflow.py:97
+msgid "Room password"
+msgstr "Zimmerpasswort"
+
+#: pretix_roomsharing/checkoutflow.py:82
+msgid "This room does not exist. Are you sure you entered the name correctly?"
+msgstr "Dieses Zimmer existiert nicht. Hast du den Namen richtig eingegeben?"
+
+#: pretix_roomsharing/checkoutflow.py:86
+msgid ""
+"The password does not match. Please enter the password exactly as your "
+"friends send it."
+msgstr ""
+"Das Passwort stimmt nicht. Bitte gib das Passwort genau so ein, wie deine "
+"Freund*innen es dir geschickt haben."
+
+#: pretix_roomsharing/checkoutflow.py:160
+msgctxt "checkoutflow"
+msgid "Room"
+msgstr "Zimmer"
+
+#: pretix_roomsharing/checkoutflow.py:201
+msgid "We couldn't handle your input, please check below for errors."
+msgstr ""
+"Wir konnten deine Eingabe nicht verarbeiten. Bitte prüfe die Fehler unten."
+
+#: pretix_roomsharing/checkoutflow.py:325
+#, python-brace-format
+msgid ""
+"You requested to join a room that participates in \"{subevent_room}\", while "
+"you chose to participate in \"{subevent_cart}\". Please choose a different "
+"room."
+msgstr ""
+"Du möchtest einem Zimmer beitreten, das an „{subevent_room}“ teilnimmt, hast "
+"aber „{subevent_cart}“ gewählt. Bitte wähle ein anderes Zimmer."
+
+#: pretix_roomsharing/models.py:23
+#: pretix_roomsharing/templates/pretix_roomsharing/settings.html:25
+msgid "Maximum number of people per room"
+msgstr "Maximale Personenzahl pro Zimmer"
+
+#: pretix_roomsharing/models.py:42
+#: pretix_roomsharing/templates/pretix_roomsharing/control_list.html:29
+#: pretix_roomsharing/templates/pretix_roomsharing/control_order_info.html:28
+msgid "Room number"
+msgstr "Zimmernummer"
+
+#: pretix_roomsharing/models.py:43
+msgid "For example the hotel room number. Set by staff."
+msgstr "Zum Beispiel die Zimmernummer im Hotel. Wird vom Team festgelegt."
+
+#: pretix_roomsharing/models.py:53
+#: pretix_roomsharing/templates/pretix_roomsharing/settings.html:22
+msgid "Product"
+msgstr "Produkt"
+
+#: pretix_roomsharing/models.py:61
+#: pretix_roomsharing/templates/pretix_roomsharing/settings.html:23
+msgid "Variation"
+msgstr "Variante"
+
+#: pretix_roomsharing/models.py:80
+#: pretix_roomsharing/templates/pretix_roomsharing/checkout_confirm.html:12
+#: pretix_roomsharing/templates/pretix_roomsharing/control_order_info.html:15
+#: pretix_roomsharing/templates/pretix_roomsharing/control_order_info.html:21
+msgid "Room"
+msgstr "Zimmer"
+
+#: pretix_roomsharing/models.py:82
+msgid "Room administrator"
+msgstr "Zimmerverwaltung"
+
+#: pretix_roomsharing/signals.py:162
+msgid "Room member"
+msgstr "Zimmermitglied"
+
+#: pretix_roomsharing/signals.py:194
+msgid "The user left a room."
+msgstr "Die Person hat ein Zimmer verlassen."
+
+#: pretix_roomsharing/signals.py:195
+msgid "The user joined a room."
+msgstr "Die Person ist einem Zimmer beigetreten."
+
+#: pretix_roomsharing/signals.py:196
+msgid "The user created a new room."
+msgstr "Die Person hat ein neues Zimmer erstellt."
+
+#: pretix_roomsharing/signals.py:197
+msgid "The user changed a room password."
+msgstr "Die Person hat ein Zimmerpasswort geändert."
+
+#: pretix_roomsharing/signals.py:198 pretix_roomsharing/signals.py:215
+#: pretix_roomsharing/views.py:635
+msgid "The room has been deleted."
+msgstr "Das Zimmer wurde gelöscht."
+
+#: pretix_roomsharing/signals.py:200
+#, python-brace-format
+msgid "The order has been moved to the room \"{room_name}\"."
+msgstr "Die Bestellung wurde in das Zimmer „{room_name}“ verschoben."
+
+#: pretix_roomsharing/signals.py:203
+#, python-brace-format
+msgid "The order could not be added to the room \"{room_name}\": {reason}"
+msgstr ""
+"Die Bestellung konnte nicht zum Zimmer „{room_name}“ hinzugefügt werden: "
+"{reason}"
+
+#: pretix_roomsharing/signals.py:213
+msgid "The room has been created."
+msgstr "Das Zimmer wurde erstellt."
+
+#: pretix_roomsharing/signals.py:214
+msgid "The room has been changed."
+msgstr "Das Zimmer wurde geändert."
+
+#: pretix_roomsharing/signals.py:219
+#, python-brace-format
+msgid "Room {val}"
+msgstr "Zimmer {val}"
+
+#: pretix_roomsharing/signals.py:259
+msgid "Statistics"
+msgstr "Statistiken"
+
+#: pretix_roomsharing/signals.py:272
+msgid "Exact matches only"
+msgstr "Nur exakte Treffer"
+
+#: pretix_roomsharing/signals.py:315
+msgid "Room name (Roomsharing)"
+msgstr "Zimmername (Zimmerteilung)"
+
+#: pretix_roomsharing/signals.py:316
+msgid "Room 1"
+msgstr "Zimmer 1"
+
+#: pretix_roomsharing/signals.py:320
+msgid "Room number (Roomsharing)"
+msgstr "Zimmernummer (Zimmerteilung)"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/checkout_confirm.html:8
+msgid "Modify"
+msgstr "Ändern"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/checkout_confirm.html:18
+#: pretix_roomsharing/templates/pretix_roomsharing/order_info.html:20
+#: pretix_roomsharing/templates/pretix_roomsharing/order_room_change.html:14
+#, python-format
+msgid ""
+"You are taking part in the roomshare as part of the room <strong>%(room)s</"
+"strong>."
+msgstr ""
+"Du nimmst an der Zimmerteilung als Teil des Zimmers "
+"<strong>%(room)s</strong> teil."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/checkout_confirm.html:24
+#, python-format
+msgid ""
+"You are taking part in the roomshare as part of the <strong>newly created</"
+"strong> room <strong>%(room)s</strong>."
+msgstr ""
+"Du nimmst an der Zimmerteilung als Teil des <strong>neu erstellten</strong> "
+"Zimmers <strong>%(room)s</strong> teil."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/checkout_confirm.html:30
+msgid ""
+"You will be randomly assigned a room or you have a ticket type that doesn't "
+"allow a room share."
+msgstr ""
+"Dir wird zufällig ein Zimmer zugewiesen, oder dein Tickettyp erlaubt keine "
+"Zimmerteilung."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/checkout_room.html:7
+msgid ""
+"You will share a room together with other attendees. You can create or join "
+"a rooming group. Please share this information with the friends, that you "
+"want to room with!"
+msgstr ""
+"Du teilst dir ein Zimmer mit anderen Teilnehmenden. Du kannst eine "
+"Zimmergruppe erstellen oder einer beitreten. Bitte gib diese Informationen "
+"an die Freund*innen weiter, mit denen du dir ein Zimmer teilen möchtest!"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/checkout_room.html:23
+msgid "No room types in order"
+msgstr "Keine Zimmertypen in der Bestellung"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/checkout_room.html:30
+msgid ""
+"Your ticket doesn't grant you a room, so there is nothing for you to do "
+"here. Press continue to keep going!"
+msgstr ""
+"Dein Ticket beinhaltet kein Zimmer, daher gibt es hier für dich nichts zu "
+"tun. Klicke auf „Weiter“, um fortzufahren!"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/checkout_room.html:40
+#: pretix_roomsharing/templates/pretix_roomsharing/order_room_change.html:58
+#: pretix_roomsharing/templates/pretix_roomsharing/order_room_change.html:73
+msgid "Go back"
+msgstr "Zurück"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/checkout_room.html:45
+#: pretix_roomsharing/templates/pretix_roomsharing/order_room_change.html:78
+msgid "Continue"
+msgstr "Weiter"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_create.html:4
+#: pretix_roomsharing/templates/pretix_roomsharing/control_create.html:6
+#: pretix_roomsharing/templates/pretix_roomsharing/control_list.html:12
+msgid "Create a new room"
+msgstr "Neues Zimmer erstellen"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_create.html:8
+msgid ""
+"After creating the room, you can add orders to it. Attendees can only join "
+"the room themselves if it has a password; without one, only staff can add "
+"people."
+msgstr ""
+"Nach dem Erstellen des Zimmers kannst du Bestellungen hinzufügen. "
+"Teilnehmende können dem Zimmer nur selbst beitreten, wenn es ein Passwort "
+"hat; ohne Passwort kann nur das Team Personen hinzufügen."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_create.html:18
+#: pretix_roomsharing/templates/pretix_roomsharing/control_delete.html:17
+#: pretix_roomsharing/templates/pretix_roomsharing/control_order_room_change.html:25
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_create.html:21
+msgid "Create"
+msgstr "Erstellen"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_delete.html:6
+#: pretix_roomsharing/templates/pretix_roomsharing/control_delete.html:8
+msgid "Delete room"
+msgstr "Zimmer löschen"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_delete.html:12
+#, python-format
+msgid "Are you sure you want to delete the room <strong>%(room)s</strong>?"
+msgstr "Möchtest du das Zimmer <strong>%(room)s</strong> wirklich löschen?"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_delete.html:14
+msgid "All orders connected to this room will be removed from the room first."
+msgstr ""
+"Alle mit diesem Zimmer verbundenen Bestellungen werden zuerst aus dem Zimmer "
+"entfernt."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_delete.html:20
+msgid "Delete"
+msgstr "Löschen"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_detail.html:6
+#: pretix_roomsharing/templates/pretix_roomsharing/control_detail.html:8
+msgid "Room detail"
+msgstr "Zimmerdetails"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_detail.html:13
+#: pretix_roomsharing/templates/pretix_roomsharing/control_order_room_change.html:5
+#: pretix_roomsharing/templates/pretix_roomsharing/control_order_room_change.html:9
+#: pretix_roomsharing/templates/pretix_roomsharing/order_room_change.html:5
+#: pretix_roomsharing/templates/pretix_roomsharing/order_room_change.html:7
+msgid "Change room"
+msgstr "Zimmer ändern"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_detail.html:19
+#: pretix_roomsharing/templates/pretix_roomsharing/control_order_room_change.html:28
+#: pretix_roomsharing/templates/pretix_roomsharing/order_room_change.html:47
+#: pretix_roomsharing/templates/pretix_roomsharing/settings.html:62
+msgid "Save"
+msgstr "Speichern"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_detail.html:24
+msgid "Connected orders"
+msgstr "Verbundene Bestellungen"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_detail.html:27
+#: pretix_roomsharing/templates/pretix_roomsharing/order_info.html:34
+#, python-format
+msgid "%(occupancy)s of %(capacity)s places in this room are taken."
+msgstr "%(occupancy)s von %(capacity)s Plätzen in diesem Zimmer sind belegt."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_detail.html:31
+#, python-format
+msgid "%(occupancy)s person is in this room."
+msgid_plural "%(occupancy)s people are in this room."
+msgstr[0] "%(occupancy)s Person ist in diesem Zimmer."
+msgstr[1] "%(occupancy)s Personen sind in diesem Zimmer."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_detail.html:42
+#, python-format
+msgid "Order %(code)s"
+msgstr "Bestellung %(code)s"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_detail.html:47
+msgid ""
+"No orders connected. Maybe someone created this room and hasn't yet "
+"completed checkout."
+msgstr ""
+"Keine Bestellungen verbunden. Vielleicht hat jemand dieses Zimmer erstellt "
+"und die Bestellung noch nicht abgeschlossen."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_detail.html:56
+msgid "Add order to this room"
+msgstr "Bestellung zu diesem Zimmer hinzufügen"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_detail.html:58
+#: pretix_roomsharing/utils.py:117 pretix_roomsharing/views.py:523
+msgid "Order code"
+msgstr "Bestellnummer"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_detail.html:62
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_detail.html:65
+msgid ""
+"Moves the order into this room, also if it's currently in another room. "
+"Staff changes are not checked against the room's maximum size or ticket type."
+msgstr ""
+"Verschiebt die Bestellung in dieses Zimmer, auch wenn sie sich gerade in "
+"einem anderen Zimmer befindet. Änderungen durch das Team werden nicht gegen "
+"die maximale Größe oder den Tickettyp des Zimmers geprüft."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_list.html:6
+#: pretix_roomsharing/templates/pretix_roomsharing/control_list.html:8
+msgid "Room list"
+msgstr "Zimmerliste"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_list.html:18
+msgid "No rooms."
+msgstr "Keine Zimmer."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_list.html:30
+#: pretix_roomsharing/views.py:437
+msgid "Room type"
+msgstr "Zimmertyp"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_list.html:31
+msgid "People"
+msgstr "Personen"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_list.html:50
+msgid "None"
+msgstr "Keine"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_order_info.html:10
+msgid "Change"
+msgstr "Ändern"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_order_info.html:31
+msgid "Administrator"
+msgstr "Verwaltung"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_order_info.html:32
+msgid "Yes"
+msgstr "Ja"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_order_info.html:32
+msgid "No"
+msgstr "Nein"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_order_info.html:36
+msgid "No room."
+msgstr "Kein Zimmer."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_order_room_change.html:12
+#, python-format
+msgid "Back to order %(order)s"
+msgstr "Zurück zu Bestellung %(order)s"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_stats.html:5
+#: pretix_roomsharing/templates/pretix_roomsharing/control_stats.html:7
+msgid "Room statistics"
+msgstr "Zimmerstatistik"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_stats.html:14
+msgid "Metric"
+msgstr "Kennzahl"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_stats.html:18
+msgid "Total"
+msgstr "Gesamt"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_stats.html:33
+msgid "Individual tickets"
+msgstr "Einzelne Tickets"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_stats.html:40
+msgid "Number of rooms"
+msgstr "Anzahl der Zimmer"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/control_stats.html:47
+msgid "Tickets that are part of a room"
+msgstr "Tickets, die zu einem Zimmer gehören"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/fragment_roomform.html:13
+msgid "I want to be assigned a random room"
+msgstr "Ich möchte zufällig einem Zimmer zugewiesen werden"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/fragment_roomform.html:20
+msgid "Alright, you're good to go!"
+msgstr "Alles klar, du kannst weitermachen!"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/fragment_roomform.html:33
+msgid "I want to join an existing room"
+msgstr "Ich möchte einem bestehenden Zimmer beitreten"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/fragment_roomform.html:52
+msgid "I want to create a new room"
+msgstr "Ich möchte ein neues Zimmer erstellen"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/order_info.html:9
+msgid "Change details"
+msgstr "Details bearbeiten"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/order_info.html:27
+#, python-format
+msgid "Your room number is <strong>%(number)s</strong>."
+msgstr "Deine Zimmernummer lautet <strong>%(number)s</strong>."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/order_info.html:41
+msgid "You have created this room."
+msgstr "Du hast dieses Zimmer erstellt."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/order_info.html:46
+msgid "Your fellow room members are:"
+msgstr "Deine Mitbewohner*innen sind:"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/order_info.html:52
+msgid "Nobody has joined your room yet. Go tell your friends about it!"
+msgstr ""
+"Bisher ist noch niemand deinem Zimmer beigetreten. Erzähl deinen "
+"Freund*innen davon!"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/order_info.html:57
+msgid ""
+"You will be randomly assigned a room or you have a ticket type without a "
+"room."
+msgstr ""
+"Dir wird zufällig ein Zimmer zugewiesen, oder dein Tickettyp beinhaltet kein "
+"Zimmer."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/order_room_change.html:12
+msgid "Your room membership"
+msgstr "Deine Zimmermitgliedschaft"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/order_room_change.html:19
+msgid "You need to leave this room before you can join or create a new one."
+msgstr ""
+"Du musst dieses Zimmer verlassen, bevor du einem anderen beitreten oder ein "
+"neues erstellen kannst."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/order_room_change.html:25
+msgid ""
+"You are the creator of this room. If you leave it, nobody will be able to "
+"change the password any more."
+msgstr ""
+"Du hast dieses Zimmer erstellt. Wenn du es verlässt, kann niemand mehr das "
+"Passwort ändern."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/order_room_change.html:33
+msgid "Leave room"
+msgstr "Zimmer verlassen"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/order_room_change.html:42
+msgid "Change room password"
+msgstr "Zimmerpasswort ändern"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/settings.html:4
+#: pretix_roomsharing/templates/pretix_roomsharing/settings.html:6
+msgid "Roomsharing Settings"
+msgstr "Einstellungen Zimmerteilung"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/settings.html:11
+msgid "Room products"
+msgstr "Zimmerprodukte"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/settings.html:13
+msgid ""
+"Attendees who buy one of the selected products or variations can create or "
+"join a room. Leave the maximum empty for rooms without a size limit."
+msgstr ""
+"Teilnehmende, die eines der ausgewählten Produkte oder eine der Varianten "
+"kaufen, können ein Zimmer erstellen oder einem beitreten. Lass das Maximum "
+"leer für Zimmer ohne Größenbeschränkung."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/settings.html:24
+msgid "Room product"
+msgstr "Zimmerprodukt"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/settings.html:43
+msgid "This event has no products yet."
+msgstr "Diese Veranstaltung hat noch keine Produkte."
+
+#: pretix_roomsharing/templates/pretix_roomsharing/settings.html:51
+msgid "Room choice"
+msgstr "Zimmerwahl"
+
+#: pretix_roomsharing/templates/pretix_roomsharing/settings.html:56
+msgid "Shown to attendees"
+msgstr "Wird Teilnehmenden angezeigt"
+
+#: pretix_roomsharing/utils.py:62
+msgid ""
+"Your order contains different ticket types. Rooms can only be shared by "
+"people with the same ticket type, so you can't create or join a room with "
+"this order."
+msgstr ""
+"Deine Bestellung enthält verschiedene Tickettypen. Zimmer können nur von "
+"Personen mit demselben Tickettyp geteilt werden, daher kannst du mit dieser "
+"Bestellung kein Zimmer erstellen oder einem beitreten."
+
+#: pretix_roomsharing/utils.py:79
+#, python-brace-format
+msgid ""
+"Your order contains more tickets than fit in one room (at most {max_people} "
+"people)."
+msgstr ""
+"Deine Bestellung enthält mehr Tickets, als in ein Zimmer passen (höchstens "
+"{max_people} Personen)."
+
+#: pretix_roomsharing/utils.py:98
+#, python-brace-format
+msgid "This room is only for people with a \"{room_type}\" ticket."
+msgstr "Dieses Zimmer ist nur für Personen mit einem Ticket „{room_type}“."
+
+#: pretix_roomsharing/utils.py:104
+msgid "This room is full. Please choose a different room."
+msgstr "Dieses Zimmer ist voll. Bitte wähle ein anderes Zimmer."
+
+#: pretix_roomsharing/utils.py:112
+msgid "Please create a new room or join an existing one."
+msgstr "Bitte erstelle ein neues Zimmer oder tritt einem bestehenden bei."
+
+#: pretix_roomsharing/utils.py:117
+msgid "Attendee name"
+msgstr "Name Teilnehmer*in"
+
+#: pretix_roomsharing/views.py:49
+msgid "Only allow people with the same ticket to share a room"
+msgstr "Nur Personen mit demselben Ticket dürfen sich ein Zimmer teilen"
+
+#: pretix_roomsharing/views.py:51
+msgid ""
+"If enabled, people can only join a room if all their room tickets have the "
+"same product and variation as the ticket of the person who created it."
+msgstr ""
+"Wenn aktiviert, können Personen einem Zimmer nur beitreten, wenn alle ihre "
+"Zimmertickets dasselbe Produkt und dieselbe Variante haben wie das Ticket "
+"der Person, die das Zimmer erstellt hat."
+
+#: pretix_roomsharing/views.py:57
+msgid "Allow attendees to be assigned a random room"
+msgstr "Teilnehmenden erlauben, sich zufällig einem Zimmer zuweisen zu lassen"
+
+#: pretix_roomsharing/views.py:59
+msgid ""
+"If disabled, attendees with a room ticket must create or join a room. With "
+"the same ticket option enabled, orders that mix ticket types then can't be "
+"completed until the cart is changed."
+msgstr ""
+"Wenn deaktiviert, müssen Teilnehmende mit einem Zimmerticket ein Zimmer "
+"erstellen oder einem beitreten. Ist zusätzlich die Option für dasselbe "
+"Ticket aktiviert, können Bestellungen mit gemischten Tickettypen erst "
+"abgeschlossen werden, wenn der Warenkorb geändert wurde."
+
+#: pretix_roomsharing/views.py:66
+msgid "Show the room number to attendees"
+msgstr "Zimmernummer den Teilnehmenden anzeigen"
+
+#: pretix_roomsharing/views.py:68
+msgid ""
+"If enabled, attendees see the room number staff entered for their room on "
+"their order page."
+msgstr ""
+"Wenn aktiviert, sehen Teilnehmende auf ihrer Bestellseite die Zimmernummer, "
+"die das Team für ihr Zimmer eingetragen hat."
+
+#: pretix_roomsharing/views.py:74
+msgid "Details shown about room members"
+msgstr "Angezeigte Details zu Zimmermitgliedern"
+
+#: pretix_roomsharing/views.py:76
+msgid ""
+"Attendees see these details about the other people in their room on their "
+"order page. Only select information people are comfortable sharing with "
+"their roommates."
+msgstr ""
+"Teilnehmende sehen diese Details über die anderen Personen in ihrem Zimmer "
+"auf ihrer Bestellseite. Wähle nur Informationen aus, die Personen gerne mit "
+"ihren Mitbewohner*innen teilen."
+
+#: pretix_roomsharing/views.py:115
+msgid "Unlimited"
+msgstr "Unbegrenzt"
+
+#: pretix_roomsharing/views.py:168
+msgid "Your changes have been saved."
+msgstr "Deine Änderungen wurden gespeichert."
+
+#: pretix_roomsharing/views.py:181
+msgid "We could not save your changes. See below for details."
+msgstr ""
+"Wir konnten deine Änderungen nicht speichern. Details findest du unten."
+
+#: pretix_roomsharing/views.py:189
+msgid "New room password"
+msgstr "Neues Zimmerpasswort"
+
+#: pretix_roomsharing/views.py:190
+msgid "Optional"
+msgstr "Optional"
+
+#: pretix_roomsharing/views.py:212
+msgid "The room for this order cannot be changed."
+msgstr "Das Zimmer für diese Bestellung kann nicht geändert werden."
+
+#: pretix_roomsharing/views.py:232
+msgid "Okay, you left your room successfully. How do you want to continue?"
+msgstr "Okay, du hast dein Zimmer verlassen. Wie möchtest du weitermachen?"
+
+#: pretix_roomsharing/views.py:261
+msgid "Okay, we changed the password. Make sure to tell your friends!"
+msgstr ""
+"Okay, wir haben das Passwort geändert. Sag es unbedingt deinen Freund*innen!"
+
+#: pretix_roomsharing/views.py:275 pretix_roomsharing/views.py:291
+#: pretix_roomsharing/views.py:296 pretix_roomsharing/views.py:405
+#: pretix_roomsharing/views.py:588
+msgid "Great, we saved your changes!"
+msgstr "Super, wir haben deine Änderungen gespeichert!"
+
+#: pretix_roomsharing/views.py:303 pretix_roomsharing/views.py:409
+msgid "We could not handle your input. See below for more information."
+msgstr ""
+"Wir konnten deine Eingabe nicht verarbeiten. Weitere Informationen findest "
+"du unten."
+
+#: pretix_roomsharing/views.py:440
+msgid ""
+"Determines the maximum number of people in this room and, if enabled, which "
+"ticket people need to join it. Staff changes are not checked against these "
+"limits."
+msgstr ""
+"Legt die maximale Personenzahl in diesem Zimmer fest und, falls aktiviert, "
+"welches Ticket Personen für den Beitritt benötigen. Änderungen durch das "
+"Team werden nicht gegen diese Grenzen geprüft."
+
+#: pretix_roomsharing/views.py:453
+msgid "No room type"
+msgstr "Kein Zimmertyp"
+
+#: pretix_roomsharing/views.py:478
+msgid "Duplicate room name"
+msgstr "Doppelter Zimmername"
+
+#: pretix_roomsharing/views.py:517
+msgid "The room has been created. You can now add orders to it."
+msgstr "Das Zimmer wurde erstellt. Du kannst jetzt Bestellungen hinzufügen."
+
+#: pretix_roomsharing/views.py:536
+msgid "There is no order with this code."
+msgstr "Es gibt keine Bestellung mit dieser Nummer."
+
+#: pretix_roomsharing/views.py:559
+#, python-brace-format
+msgid "Order {code} has been added to this room."
+msgstr "Bestellung {code} wurde zu diesem Zimmer hinzugefügt."
+
+#: pretix_roomsharing/views.py:566
+#, python-brace-format
+msgid "This room now has more people than its maximum of {max}."
+msgstr "Dieses Zimmer hat jetzt mehr Personen als das Maximum von {max}."
+
+#: pretix_roomsharing/views.py:657
+msgid "All tickets, total"
+msgstr "Alle Tickets, gesamt"
+
+#: pretix_roomsharing/views.py:663
+msgid "Tickets Pending"
+msgstr "Ausstehende Tickets"
+
+#: pretix_roomsharing/views.py:671
+msgid "Tickets in approved orders (regardless of payment status)"
+msgstr "Tickets in freigegebenen Bestellungen (unabhängig vom Zahlungsstatus)"
+
+#: pretix_roomsharing/views.py:677
+msgid "Tickets in paid orders"
+msgstr "Tickets in bezahlten Bestellungen"
+
+#: pretix_roomsharing/views.py:684
+msgid "Tickets in pending orders"
+msgstr "Tickets in ausstehenden Bestellungen"
+
+#: pretix_roomsharing/views.py:692
+msgid "Tickets in canceled orders (except the ones not chosen in raffle)"
+msgstr ""
+"Tickets in stornierten Bestellungen (außer den in der Verlosung nicht "
+"gezogenen)"
+
+#: pretix_roomsharing/views.py:701
+msgid "Tickets in canceled and at least partially refunded orders"
+msgstr ""
+"Tickets in stornierten und mindestens teilweise erstatteten Bestellungen"
+
+#: pretix_roomsharing/views.py:716
+msgid "Tickets denied (not chosen in raffle)"
+msgstr "Abgelehnte Tickets (in der Verlosung nicht gezogen)"
