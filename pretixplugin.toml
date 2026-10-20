@@ -2,3 +2,4 @@
 package = "pretix-roomsharing"
 modules = [ "pretix_roomsharing" ]
 marketplace_name = "roomsharing"
+pypi = true
