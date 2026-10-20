@@ -32,6 +32,7 @@ requires = [
 
 [project.urls]
 homepage = "https://github.com/techwolf12/pretix-roomsharing"
+changelog = "https://github.com/techwolf12/pretix-roomsharing/blob/main/CHANGELOG.rst"
 
 [tool.setuptools]
 include-package-data = true

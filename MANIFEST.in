@@ -2,4 +2,5 @@ recursive-include pretix_roomsharing/static *
 recursive-include pretix_roomsharing/templates *
 recursive-include pretix_roomsharing/locale *
 include LICENSE
+include CHANGELOG.rst
 exclude .gitlab-ci.yml
